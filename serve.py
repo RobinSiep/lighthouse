@@ -17,9 +17,18 @@ def connect(sid, environ):
 
 
 @sio.event
-async def chat_message(sid, data):
-    print("message ", data)
-    await sio.emit('reply', room=sid)
+async def identify(sid, data):
+    print(f"Client identified: {data}")
+    # Temporarily call get_sys_info sync
+    await get_sys_info(sid)
+
+
+async def get_sys_info(sid):
+    await sio.emit('sys_info', to=sid, callback=recv_sys_info)
+
+
+def recv_sys_info(sys_info):
+    print(sys_info)
 
 
 @sio.event
