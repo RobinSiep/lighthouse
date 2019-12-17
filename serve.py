@@ -1,3 +1,5 @@
+import json
+
 import socketio
 from aiohttp import web
 
@@ -28,7 +30,7 @@ async def get_sys_info(sid):
 
 
 def recv_sys_info(sys_info):
-    print(sys_info)
+    print(json.dumps(sys_info, indent=4))
 
 
 @sio.event
