@@ -3,19 +3,19 @@ import json
 import socketio
 from aiohttp import web
 
-sio = socketio.AsyncServer()
+sio = socketio.AsyncServer(cors_allowed_origins="*")
 app = web.Application()
 sio.attach(app)
 
-devices = {}
+machines = {}
 
 
 async def index(request):
     return web.Response(text="Lighthouse", content_type='application/json')
 
 
-async def list_devices(request):
-    return web.json_response(devices)
+async def list_machines(request):
+    return web.json_response(machines)
 
 
 @sio.event
@@ -26,7 +26,7 @@ def connect(sid, environ):
 @sio.event
 async def identify(sid, data):
     print(f"Client identified: {data}")
-    devices[sid] = data
+    machines[sid] = data
     # Temporarily call get_sys_info sync
     await get_sys_info(sid)
 
@@ -37,8 +37,13 @@ async def get_sys_info(sid):
 
 @sio.event
 async def sys_info(sid, sys_info):
-    devices[sid].update(sys_info)
-    print(json.dumps(devices[sid], indent=4))
+    print(json.dumps(machines[sid], indent=4))
+    update_machine(sid, sys_info)
+
+
+def update_machine(sid, sys_info):
+    machines[sid].update(sys_info)
+    await sio.emit('machines', machines)
 
 
 @sio.event
@@ -47,7 +52,7 @@ def disconnect(sid):
 
 
 app.router.add_get('/', index)
-app.router.add_get('/devices', list_devices)
+app.router.add_get('/machines', list_machines)
 
 if __name__ == '__main__':
     web.run_app(app)
