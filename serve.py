@@ -37,17 +37,27 @@ async def get_sys_info(sid):
 
 @sio.event
 async def sys_info(sid, sys_info):
+    await update_machine(sid, sys_info)
     print(json.dumps(machines[sid], indent=4))
-    update_machine(sid, sys_info)
 
 
-def update_machine(sid, sys_info):
+async def update_machine(sid, sys_info):
     machines[sid].update(sys_info)
     await sio.emit('machines', machines)
 
 
+async def delete_machine(sid):
+    try:
+        machines.pop(sid)
+        await sio.emit('machines', machines)
+    except KeyError:
+        # Machine not found for sid, no state update
+        pass
+
+
 @sio.event
-def disconnect(sid):
+async def disconnect(sid):
+    await delete_machine(sid)
     print('disconnect ', sid)
 
 
