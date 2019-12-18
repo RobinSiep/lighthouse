@@ -14,20 +14,20 @@ async def index(request):
     return web.Response(text="Lighthouse", content_type='application/json')
 
 
-async def list_machines(request):
-    return web.json_response(machines)
-
-
 @sio.event
-def connect(sid, environ):
-    print("connect ", sid)
+async def connect(sid, environ):
+    client_type = 'web'
+    if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
+        client_type = 'machine'
+    else:
+        await sio.emit('machines', machines)
+    print(f"connect {client_type} {sid}")
 
 
 @sio.event
 async def identify(sid, data):
     print(f"Client identified: {data}")
     machines[sid] = data
-    # Temporarily call get_sys_info sync
     await get_sys_info(sid)
 
 
@@ -62,7 +62,6 @@ async def disconnect(sid):
 
 
 app.router.add_get('/', index)
-app.router.add_get('/machines', list_machines)
 
 if __name__ == '__main__':
     web.run_app(app)
