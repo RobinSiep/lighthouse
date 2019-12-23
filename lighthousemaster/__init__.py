@@ -13,7 +13,7 @@ async def connect(sid, environ):
     if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
         client_type = 'machine'
     else:
-        emit_machines()
+        await emit_machines()
     print(f"connect {client_type} {sid}")
 
 
@@ -41,4 +41,4 @@ async def disconnect(sid):
 
 
 if __name__ == '__main__':
-    web.run_app(app)
+    web.run_app(app, port=7102)
