@@ -18,8 +18,8 @@ def main():
 
 def read_settings():
     config = configparser.ConfigParser()
-    config.read('../settings.ini')
-    config.read('../local-settings.ini')
+    config.read('lighthouse-master/settings.ini')
+    config.read('lighthouse-master/local-settings.ini')
     update_settings(config)
 
 

@@ -2,7 +2,10 @@ from setuptools import setup
 
 requires = [
     'aiohttp',
-    'python-socketio'
+    'psycopg2',
+    'python-socketio',
+    'sqlalchemy',
+    'zope.sqlalchemy'
 ]
 
 setup(
