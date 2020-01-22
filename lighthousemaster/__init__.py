@@ -1,10 +1,26 @@
+import configparser
 import json
 
 from aiohttp import web
 
 from lighthousemaster.app import app, sio
+from lighthousemaster.db import init_sqlalchemy
+from lighthousemaster.lib.settings import update_settings
 from lighthousemaster.machine import (set_machine, update_machine,
                                       delete_machine, emit_machines, machines)
+
+
+def main():
+    read_settings()
+    init_sqlalchemy()
+    web.run_app(app, port=7102)
+
+
+def read_settings():
+    config = configparser.ConfigParser()
+    config.read('../settings.ini')
+    config.read('../local-settings.ini')
+    update_settings(config)
 
 
 @sio.event
@@ -41,4 +57,4 @@ async def disconnect(sid):
 
 
 if __name__ == '__main__':
-    web.run_app(app, port=7102)
+    main()
