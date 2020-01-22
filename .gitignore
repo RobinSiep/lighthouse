@@ -59,4 +59,8 @@ ENV/
 env.bak/
 venv.bak/
 
+# Settings
 local-settings.ini
+
+# Docker compose
+dev-compose.yml
