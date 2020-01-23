@@ -16,7 +16,7 @@ fileConfig(config.config_file_name)
 
 def run_migrations_offline():
     try:
-        url = alembic_settings['sqlalchemy']['url']
+        url = alembic_settings['sqlalchemy.url']
     except KeyError:
         url = get_connection_url(alembic_settings)
 
@@ -37,10 +37,10 @@ def run_migrations_online():
     settings_for_engine = {}
 
     try:
-        settings_for_engine['sqlalchemy']['url'] = alembic_settings[
+        settings_for_engine['sqlalchemy.url'] = alembic_settings[
             'sqlalchemy.url']
     except KeyError:
-        settings_for_engine['sqlalchemy']['url'] = get_connection_url(
+        settings_for_engine['sqlalchemy.url'] = get_connection_url(
             alembic_settings)
 
     connectable = engine_from_config(
