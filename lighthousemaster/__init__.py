@@ -1,5 +1,4 @@
 import configparser
-import json
 
 from aiohttp import web
 
@@ -7,7 +6,7 @@ from lighthousemaster.app import app, sio
 from lighthousemaster.db import init_sqlalchemy
 from lighthousemaster.lib.settings import update_settings
 from lighthousemaster.machine import (set_machine, update_machine,
-                                      delete_machine, emit_machines, machines)
+                                      delete_machine, emit_machines)
 
 
 def main():
@@ -47,7 +46,6 @@ async def get_sys_info(sid):
 @sio.event
 async def sys_info(sid, sys_info):
     await update_machine(sid, sys_info)
-    print(json.dumps(machines[sid], indent=4))
 
 
 @sio.event
