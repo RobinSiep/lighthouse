@@ -3,6 +3,7 @@ from setuptools import setup
 requires = [
     'aiohttp',
     'alembic',
+    'marshmallow',
     'psycopg2',
     'python-socketio',
     'sqlalchemy',
