@@ -10,6 +10,7 @@ class Machine(Base):
     __tablename__ = 'machine'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    sid = Column(String(32), unique=True, nullable=False)
     name = Column(String(64), unique=True, nullable=False)
     mac_address = Column(String(17), unique=True, nullable=False)
 

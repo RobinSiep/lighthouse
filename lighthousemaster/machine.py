@@ -12,7 +12,6 @@ machine_sys_info = {}
 
 
 async def set_machine(sid, machine_data):
-    print(sid)
     validated_data = MachineSchema().load(machine_data)
 
     try:
@@ -21,6 +20,7 @@ async def set_machine(sid, machine_data):
     except NoResultFound:
         machine = Machine(
             id=str(uuid.uuid4()),
+            sid=sid,
             **validated_data
         )
 
@@ -54,7 +54,7 @@ def merge_machine_and_sys_info(machine):
     machine_data = MachineSchema().dump(machine)
     try:
         machine_data['sys_info'] = machine_sys_info(machine.sid)
-    except:
+    except KeyError:
         pass
 
     return machine_data
