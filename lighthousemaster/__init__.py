@@ -6,7 +6,7 @@ from lighthousemaster.app import app, sio
 from lighthousemaster.db import init_sqlalchemy
 from lighthousemaster.lib.settings import update_settings
 from lighthousemaster.machine import (set_machine, update_machine,
-                                      delete_machine, emit_machines)
+                                      set_machine_offline, emit_machines)
 
 
 def main():
@@ -50,7 +50,7 @@ async def sys_info(sid, sys_info):
 
 @sio.event
 async def disconnect(sid):
-    await delete_machine(sid)
+    await set_machine_offline(sid)
     print('disconnect ', sid)
 
 
