@@ -1,17 +1,27 @@
 import uuid
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from lighthousemaster.app import sio
 from lighthousemaster.db import save
 from lighthousemaster.lib.validation.machine import MachineSchema
-from lighthousemaster.models.machine import Machine, list_machines
+from lighthousemaster.models.machine import (Machine, list_machines,
+                                             get_machine_by_name)
 
 
 async def set_machine(sid, machine_data):
-    save(Machine(
-        id=str(uuid.uuid4()),
-        name=machine_data['name'],
-        mac_address='test'
-    ))
+    validated_data = MachineSchema().load(machine_data)
+
+    try:
+        machine = get_machine_by_name(validated_data['name'])
+        machine.set_fields(validated_data)
+    except NoResultFound:
+        machine = Machine(
+            id=str(uuid.uuid4()),
+            **validated_data
+        )
+
+    save(machine)
 
 
 async def update_machine(sid, sys_info):

@@ -13,6 +13,14 @@ class Machine(Base):
     name = Column(String(64), unique=True, nullable=False)
     mac_address = Column(String(17), unique=True, nullable=False)
 
+    def set_fields(self, data):
+        for key, value in data.items():
+            setattr(self, key, value)
+
 
 def list_machines():
     return session.query(Machine).all()
+
+
+def get_machine_by_name(name):
+    return session.query(Machine).filter(Machine.name == name).one()
