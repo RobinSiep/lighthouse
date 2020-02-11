@@ -2,7 +2,7 @@ import uuid
 
 from lighthousemaster.app import sio
 from lighthousemaster.db import save
-from lighthousemaster.lib.validation import MachineSchema
+from lighthousemaster.lib.validation.machine import MachineSchema
 from lighthousemaster.models.machine import Machine, list_machines
 
 

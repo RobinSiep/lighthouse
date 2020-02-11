@@ -6,4 +6,4 @@ class MachineSchema(Schema):
     name = fields.String(required=True,
                          validate=validate.Length(min=1, max=64))
     mac_address = fields.String(required=True,
-                                validate=validate.Length(mix=1, max=17))
+                                validate=validate.Length(min=1, max=17))
