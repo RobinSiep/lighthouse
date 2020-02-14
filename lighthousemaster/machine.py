@@ -6,16 +6,18 @@ from lighthousemaster.app import sio
 from lighthousemaster.db import save
 from lighthousemaster.lib.validation.machine import MachineSchema
 from lighthousemaster.models.machine import (Machine, list_machines,
-                                             get_machine_by_name)
+                                             get_machine_by_sid)
 
 machine_sys_info = {}
 
 
 async def set_machine(sid, machine_data):
-    validated_data = MachineSchema().load(machine_data)
+    schema = MachineSchema()
+    schema.context = {'sid': sid}
+    validated_data = schema.load(machine_data)
 
     try:
-        machine = get_machine_by_name(validated_data['name'])
+        machine = get_machine_by_sid(sid)
         machine.set_fields(validated_data)
     except NoResultFound:
         machine = Machine(
@@ -53,7 +55,7 @@ def dump_machines():
 def merge_machine_and_sys_info(machine):
     machine_data = MachineSchema().dump(machine)
     try:
-        machine_data['sys_info'] = machine_sys_info(machine.sid)
+        machine_data['sys_info'] = machine_sys_info[machine.sid]
     except KeyError:
         pass
 

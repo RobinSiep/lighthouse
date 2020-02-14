@@ -23,5 +23,9 @@ def list_machines():
     return session.query(Machine).all()
 
 
+def get_machine_by_sid(sid):
+    return session.query(Machine).filter(Machine.sid == sid).one()
+
+
 def get_machine_by_name(name):
     return session.query(Machine).filter(Machine.name == name).one()
