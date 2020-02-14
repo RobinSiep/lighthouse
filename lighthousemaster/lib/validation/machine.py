@@ -46,7 +46,6 @@ class MachineSchema(Schema):
 
     @validates('mac_address')
     def validate_mac_address_format(self, mac_address):
-        print(mac_address)
         if re.match(MAC_ADDRESS_PATTERN, mac_address):
             return
 
