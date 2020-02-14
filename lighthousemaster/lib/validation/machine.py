@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from lighthousemaster.models.machine import get_machine_by_name
 
-MAC_ADDRESS_PATTERN = '[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$'
+MAC_ADDRESS_PATTERN = '[0-9A-F]{2}([-:]?)[0-9A-F]{2}(\\1[0-9A-F]{2}){4}$'
 
 
 class MachineSchema(Schema):
@@ -26,7 +26,9 @@ class MachineSchema(Schema):
             data['mac_address'] = data['mac_address'].upper()
         except KeyError:
             # Handled during validation
-            return
+            pass
+
+        return data
 
     @validates('name')
     def validate_name(self, name):
@@ -44,6 +46,7 @@ class MachineSchema(Schema):
 
     @validates('mac_address')
     def validate_mac_address_format(self, mac_address):
+        print(mac_address)
         if re.match(MAC_ADDRESS_PATTERN, mac_address):
             return
 
