@@ -6,23 +6,21 @@ from lighthousemaster.app import sio
 from lighthousemaster.db import save
 from lighthousemaster.lib.validation.machine import MachineSchema
 from lighthousemaster.models.machine import (Machine, list_machines,
-                                             get_machine_by_sid)
+                                             get_machine_by_mac_address)
 
 machine_sys_info = {}
 
 
 async def set_machine(sid, machine_data):
-    schema = MachineSchema()
-    schema.context = {'sid': sid}
-    validated_data = schema.load(machine_data)
+    machine_data['sid'] = sid
+    validated_data = MachineSchema().load(machine_data)
 
     try:
-        machine = get_machine_by_sid(sid)
+        machine = get_machine_by_mac_address(validated_data['mac_address'])
         machine.set_fields(validated_data)
     except NoResultFound:
         machine = Machine(
             id=str(uuid.uuid4()),
-            sid=sid,
             **validated_data
         )
 
@@ -31,7 +29,7 @@ async def set_machine(sid, machine_data):
 
 
 async def update_machine(sid, sys_info):
-    machine_sys_info[sid].update(sys_info)
+    machine_sys_info[sid] = sys_info
     await sio.emit('machines', dump_machines())
 
 

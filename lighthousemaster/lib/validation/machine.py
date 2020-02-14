@@ -1,7 +1,7 @@
 import re
 
 from marshmallow import (EXCLUDE, fields, pre_load, Schema, validate,
-                         validates, ValidationError)
+                         validates, validates_schema, ValidationError)
 from sqlalchemy.orm.exc import NoResultFound
 
 from lighthousemaster.models.machine import get_machine_by_name
@@ -14,7 +14,8 @@ class MachineSchema(Schema):
         unknown = EXCLUDE
 
     id = fields.String(dump_only=True)
-    sid = fields.String(dump_only=True)
+    sid = fields.String(required=True,
+                        validate=validate.Length(equal=32))
     name = fields.String(required=True,
                          validate=validate.Length(min=1, max=64))
     mac_address = fields.String(required=True,
@@ -30,11 +31,11 @@ class MachineSchema(Schema):
 
         return data
 
-    @validates('name')
-    def validate_name(self, name):
+    @validates_schema
+    def validate_name(self, data, **kwargs):
         try:
-            machine_with_same_name = get_machine_by_name(name)
-            if machine_with_same_name.sid == self.context['sid']:
+            machine_with_same_name = get_machine_by_name(data['name'])
+            if machine_with_same_name.mac_address == data['mac_address']:
                 # Same machine
                 return
 
@@ -42,6 +43,9 @@ class MachineSchema(Schema):
                 "A different machine with this name already exists"
             )
         except NoResultFound:
+            return
+        except KeyError:
+            # Required validation is handled in the schema field declaration
             return
 
     @validates('mac_address')
