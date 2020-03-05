@@ -16,11 +16,13 @@ class OAuthClient(Base):
     __tablename__ = 'oauth_client'
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    client_id = Column(UUID, default=uuid.uuid4)
-    client_secret = Column(String(64), default=get_random_token(32))
-    client_type = Column(Enum("confidential", name="client_type"))
-    active = Column(Boolean, default=True)
-    name = Column(String(100))
+    client_id = Column(UUID, default=uuid.uuid4, unique=True, nullable=False)
+    client_secret = Column(String(64), default=get_random_token(32),
+                           nullable=False)
+    client_type = Column(Enum("confidential", name="client_type"),
+                         nullable=False)
+    active = Column(Boolean, default=True, nullable=False)
+    name = Column(String(100), unique=True, nullable=False)
 
     def set_fields(self, data):
         for key, value in data.items():
@@ -31,12 +33,12 @@ class OAuthAccessToken(Base):
     __tablename__ = 'oauth_access_token'
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    client_id = (Column(UUID,
-                        ForeignKey('oauth_client.id')))
+    client_id = Column(UUID, ForeignKey('oauth_client.id'), nullable=False)
     access_token = Column(String(64), default=get_random_token(32),
-                          unique=True)
-    token_type = Column(Enum("Bearer", name="token_type"), default="Bearer")
-    expiry_date = Column(DateTime(timezone=True))
+                          unique=True, nullable=False)
+    token_type = Column(Enum("Bearer", name="token_type"), default="Bearer",
+                        nullable=False)
+    expiry_date = Column(DateTime(timezone=True), nullable=False)
 
     client = relationship('OAuthClient')
 
