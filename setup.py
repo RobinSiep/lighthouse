@@ -6,6 +6,7 @@ requires = [
     'alembic',
     'marshmallow',
     'psycopg2',
+    'pycrypto',
     'python-socketio',
     'sqlalchemy',
     'zope.sqlalchemy'
