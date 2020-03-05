@@ -1,11 +1,11 @@
 import datetime
 
 from aiohttp import web
-from aiohttp.web import HTTPBadRequest
 from marshmallow import ValidationError
 
 from lighthousemaster.app import app
 from lighthousemaster.lib.encrypt import get_secure_token
+from lighthousemaster.lib.exceptions import JsonHTTPBadRequest
 from lighthousemaster.lib.validation.oauth import OAuthAccessTokenSchema
 from lighthousemaster.models.oauth import OAuthAccessToken, get_client
 
@@ -19,22 +19,16 @@ def create_access_token(request):
         result = schema.load()
         grant_type = result['grant_type']
     except ValidationError as e:
-        raise HTTPBadRequest(
-            text=str(e),
-            content_type='application/json'
-        )
+        raise JsonHTTPBadRequest(json=str(e))
 
     client = get_client("", "")
 
     if (grant_type == 'client_credentials' and
             client.client_type != 'confidential'):
-        raise HTTPBadRequest(
-            text=str({
-                'invalid_client': ("Client not authorized to use this "
-                                   "grant type")
-            }),
-            content_type='application/json'
-        )
+        raise JsonHTTPBadRequest(json={
+            'invalid_client': ("Client not authorized to use this "
+                               "grant type")
+        })
 
     token = OAuthAccessToken(
         access_token=get_secure_token(),
