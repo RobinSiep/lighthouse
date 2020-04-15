@@ -4,6 +4,7 @@ from aiohttp import web
 
 from lighthousemaster.app import app, sio
 from lighthousemaster.db import init_sqlalchemy
+from lighthousemaster.handlers.oauth import *  # noqa
 from lighthousemaster.lib.settings import update_settings
 from lighthousemaster.machine import (set_machine, update_machine,
                                       set_machine_offline, emit_machines)

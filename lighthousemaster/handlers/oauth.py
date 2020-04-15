@@ -5,24 +5,28 @@ from marshmallow import ValidationError
 
 from lighthousemaster.app import app
 from lighthousemaster.db import save
-from lighthousemaster.lib.encrypt import get_secure_token
+from lighthousemaster.lib.crypto import get_random_token
 from lighthousemaster.lib.exceptions import JsonHTTPBadRequest
-from lighthousemaster.lib.validation.oauth import OAuthAccessTokenSchema
+from lighthousemaster.lib.exceptions.oauth import (
+    AuthorizationHeaderNotFound, InvalidAuthorizationMethod)
+from lighthousemaster.lib.security import extract_client_authorization
+from lighthousemaster.lib.validation.oauth import (
+    OAuthAccessTokenSchema, OAuthClientSchema)
 from lighthousemaster.models.oauth import OAuthAccessToken, get_client
 
 routes = web.RouteTableDef()
 
 
 @routes.post('/oauth/token')
-def create_access_token(request):
-    schema = OAuthAccessTokenSchema(strict=True)
+async def create_access_token(request):
+    schema = OAuthAccessTokenSchema()
     try:
-        result = schema.load()
+        result = schema.load(await request.json())
         grant_type = result['grant_type']
     except ValidationError as e:
         raise JsonHTTPBadRequest(json=str(e))
 
-    client = get_client("", "")
+    client = get_client_from_request(request)
 
     if (grant_type == 'client_credentials' and
             client.client_type != 'confidential'):
@@ -32,23 +36,37 @@ def create_access_token(request):
         })
 
     token = OAuthAccessToken(
-        access_token=get_secure_token(),
+        access_token=get_random_token(32),
         client=client,
         expiry_date=(datetime.datetime.now(datetime.timezone.utc) +
                      datetime.timedelta(hours=1)),
-        token_type='bearer'
+        token_type='Bearer'
     )
 
-    save(token)
-    response = web.json_response(schema.dump(token).data)
+    persisted_token, _ = save(token)
+    response = web.json_response(schema.dump(persisted_token))
 
     #  Response headers according to RFC 6749
-    response.headers = {
-        'cache_control': 'no-store',
-        'pragma': 'no-cache'
-    }
+    # response.headers = {
+    #     'cache_control': 'no-store',
+    #     'pragma': 'no-cache'
+    # }
 
     return response
+
+
+def get_client_from_request(request):
+    try:
+        client_credentials = extract_client_authorization(request)
+        result = OAuthClientSchema(
+            only=('client_id', 'client_secret')
+        ).load(client_credentials)
+        print(type(result['client_id']))
+    except (ValidationError, AuthorizationHeaderNotFound,
+            InvalidAuthorizationMethod) as e:
+        raise JsonHTTPBadRequest(json=str(e))
+
+    return get_client(**result)
 
 
 app.add_routes(routes)
