@@ -4,6 +4,7 @@ from aiohttp import web
 from marshmallow import ValidationError
 
 from lighthousemaster.app import app
+from lighthousemaster.db import save
 from lighthousemaster.lib.encrypt import get_secure_token
 from lighthousemaster.lib.exceptions import JsonHTTPBadRequest
 from lighthousemaster.lib.validation.oauth import OAuthAccessTokenSchema
@@ -38,8 +39,7 @@ def create_access_token(request):
         token_type='bearer'
     )
 
-    # TODO persist
-
+    save(token)
     response = web.json_response(schema.dump(token).data)
 
     #  Response headers according to RFC 6749
