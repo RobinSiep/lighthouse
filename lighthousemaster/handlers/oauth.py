@@ -44,13 +44,15 @@ async def create_access_token(request):
     )
 
     persisted_token, _ = save(token)
-    response = web.json_response(schema.dump(persisted_token))
 
     #  Response headers according to RFC 6749
-    # response.headers = {
-    #     'cache_control': 'no-store',
-    #     'pragma': 'no-cache'
-    # }
+    response = web.json_response(
+        schema.dump(persisted_token),
+        headers={
+            'cache_control': 'no-store',
+            'pragma': 'no-cache'
+        }
+    )
 
     return response
 
@@ -61,7 +63,6 @@ def get_client_from_request(request):
         result = OAuthClientSchema(
             only=('client_id', 'client_secret')
         ).load(client_credentials)
-        print(type(result['client_id']))
     except (ValidationError, AuthorizationHeaderNotFound,
             InvalidAuthorizationMethod) as e:
         raise JsonHTTPBadRequest(json=str(e))
