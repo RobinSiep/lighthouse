@@ -8,7 +8,7 @@ def extract_client_authorization(request):
     try:
         auth_method, encoded_string = request.headers[
             'Authorization'].split(' ')
-    except:  # noqa E722
+    except (KeyError, ValueError):
         raise AuthorizationHeaderNotFound
 
     if not auth_method == 'Basic':

@@ -2,6 +2,7 @@ import datetime
 
 from aiohttp import web
 from marshmallow import ValidationError
+from sqlalchemy.orm.exc import NoResultFound
 
 from lighthousemaster.app import app
 from lighthousemaster.db import save
@@ -67,7 +68,10 @@ def get_client_from_request(request):
             InvalidAuthorizationMethod) as e:
         raise JsonHTTPBadRequest(json=str(e))
 
-    return get_client(**result)
+    try:
+        return get_client(**result)
+    except NoResultFound:
+        raise JsonHTTPBadRequest(json="No client found for given client_id")
 
 
 app.add_routes(routes)
