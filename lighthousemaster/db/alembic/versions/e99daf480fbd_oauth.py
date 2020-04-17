@@ -1,5 +1,11 @@
+import uuid
+
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects.postgresql import UUID
+
+from lighthousemaster.lib.settings import settings
+from lighthousemaster.models.oauth import OAuthClient
 
 
 """oauth
@@ -15,13 +21,14 @@ revision = 'e99daf480fbd'
 down_revision = 'f2cd496a9df0'
 branch_labels = None
 depends_on = None
+default_oauth_fields = ('client_id', 'client_secret')
 
 
 def upgrade():
     op.create_table(
         'oauth_client',
-        sa.Column('id', sa.String(length=36), primary_key=True),
-        sa.Column('client_id', sa.String(length=36), unique=True,
+        sa.Column('id', UUID(as_uuid=True), primary_key=True),
+        sa.Column('client_id', UUID(as_uuid=True), unique=True,
                   nullable=False),
         sa.Column('client_secret', sa.String(length=64), nullable=False),
         sa.Column('client_type', sa.Enum('confidential', name='client_type'),
@@ -32,14 +39,30 @@ def upgrade():
 
     op.create_table(
         'oauth_access_token',
-        sa.Column('id', sa.String(length=36), primary_key=True),
-        sa.Column('client_id', sa.String(length=36), nullable=False),
+        sa.Column('id', UUID(as_uuid=True), primary_key=True),
+        sa.Column('client_id', UUID(as_uuid=True), nullable=False),
         sa.Column('access_token', sa.String(length=64), unique=True,
                   nullable=False),
         sa.Column('token_type', sa.Enum('Bearer', name='token_type'),
                   nullable=False),
         sa.Column('expiry_date', sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(['client_id'], ['oauth_client.id'], ),
+    )
+    insert_default_credentials()
+
+
+def insert_default_credentials():
+    default_oauth_creds = {k: settings[k] for k in default_oauth_fields if k in
+                           settings}
+    op.bulk_insert(
+        OAuthClient.__table__,
+        [{
+            'id': str(uuid.uuid4()),
+            'client_type': 'confidential',
+            'name': "lighthouse client",
+            'active': True,
+            **default_oauth_creds
+        }]
     )
 
 
