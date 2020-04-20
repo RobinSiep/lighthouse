@@ -31,8 +31,7 @@ def read_settings():
 async def connect(sid, environ):
     request = add_request_from_environ(sid, environ)
     if not (validate_access_token(request)):
-        await disconnect(sid)
-        return
+        return False
 
     client_type = 'web'
     if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
@@ -43,6 +42,7 @@ async def connect(sid, environ):
 
 
 @sio.event
+@auth_required
 async def identify(sid, data):
     print(f"Client identified: {data}")
     await set_machine(sid, data)
@@ -54,6 +54,7 @@ async def get_sys_info(sid):
 
 
 @sio.event
+@auth_required
 async def sys_info(sid, sys_info):
     await update_machine(sid, sys_info)
 

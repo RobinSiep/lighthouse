@@ -8,8 +8,8 @@ def add_request_from_environ(sid, environ):
 
 
 def remove_request_for_sid(sid):
-    del requests[sid]
+    requests.pop(sid, None)
 
 
 def get_request_for_sid(sid):
-    return requests[sid]
+    return requests.get(sid)

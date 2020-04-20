@@ -6,10 +6,11 @@ from lighthousemaster.lib.security import validate_access_token
 
 def auth_required(function):
     @wraps(function)
-    def wrapped(sid, *args, **kwargs):
-        if not validate_access_token(get_request_for_sid(sid)):
+    async def wrapped(sid, *args, **kwargs):
+        request = get_request_for_sid(sid)
+        if not request or not validate_access_token(request):
             from lighthousemaster import disconnect
-            disconnect(sid)
+            return await disconnect(sid)
         else:
-            return function(*args, **kwargs)
+            return await function(sid, *args, **kwargs)
     return wrapped
