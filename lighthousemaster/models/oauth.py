@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class OAuthClient(Base):
     __tablename__ = 'oauth_client'
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     client_id = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True,
                        nullable=False)
     client_secret = Column(String(64), default=get_random_token(32),
@@ -51,8 +51,18 @@ class OAuthAccessToken(Base):
         ).total_seconds()
         return seconds_left if seconds_left > 0 else 0
 
+    @property
+    def expired(self):
+        return self.expires_in == 0
+
 
 def get_client(client_id, client_secret):
     return session.query(OAuthClient).filter(
         OAuthClient.client_id == client_id,
         OAuthClient.client_secret == client_secret).one()
+
+
+def get_token_by_token(token):
+    return session.query(OAuthAccessToken).filter(
+        OAuthAccessToken.access_token == token
+    ).one()

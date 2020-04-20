@@ -5,6 +5,10 @@ from aiohttp import web
 from lighthousemaster.app import app, sio
 from lighthousemaster.db import init_sqlalchemy
 from lighthousemaster.handlers.oauth import *  # noqa
+from lighthousemaster.lib.requests import (add_request_from_environ,
+                                           remove_request_for_sid)
+from lighthousemaster.lib.security import validate_access_token
+from lighthousemaster.lib.security.decorators import auth_required
 from lighthousemaster.lib.settings import update_settings
 from lighthousemaster.machine import (set_machine, update_machine,
                                       set_machine_offline, emit_machines)
@@ -25,6 +29,11 @@ def read_settings():
 
 @sio.event
 async def connect(sid, environ):
+    request = add_request_from_environ(sid, environ)
+    if not (validate_access_token(request)):
+        await disconnect(sid)
+        return
+
     client_type = 'web'
     if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
         client_type = 'machine'
@@ -52,6 +61,7 @@ async def sys_info(sid, sys_info):
 @sio.event
 async def disconnect(sid):
     await set_machine_offline(sid)
+    remove_request_for_sid(sid)
     print('disconnect ', sid)
 
 

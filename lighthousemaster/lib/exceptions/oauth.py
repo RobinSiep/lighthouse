@@ -14,3 +14,13 @@ class InvalidAuthorizationMethod(Exception):
     def __init__(self, auth_method):
         self.message = "Wrong authorization method, expected method: {}"\
                 .format(auth_method)
+
+
+class InvalidAuthorizationHeader(Exception):
+    """
+    Raised when the authorization header is not what was expected.
+    """
+
+    def __init__(self, auth_header_pattern):
+        self.message = "Invalid authorization header, expected pattern: {}"\
+                .format(auth_header_pattern)

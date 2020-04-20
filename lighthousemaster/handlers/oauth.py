@@ -9,7 +9,8 @@ from lighthousemaster.db import save
 from lighthousemaster.lib.crypto import get_random_token
 from lighthousemaster.lib.exceptions import JsonHTTPBadRequest
 from lighthousemaster.lib.exceptions.oauth import (
-    AuthorizationHeaderNotFound, InvalidAuthorizationMethod)
+    AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
+    InvalidAuthorizationHeader)
 from lighthousemaster.lib.security import extract_client_authorization
 from lighthousemaster.lib.validation.oauth import (
     OAuthAccessTokenSchema, OAuthClientSchema)
@@ -65,7 +66,7 @@ def get_client_from_request(request):
             only=('client_id', 'client_secret')
         ).load(client_credentials)
     except (ValidationError, AuthorizationHeaderNotFound,
-            InvalidAuthorizationMethod) as e:
+            InvalidAuthorizationMethod, InvalidAuthorizationHeader) as e:
         raise JsonHTTPBadRequest(json=str(e))
 
     try:
