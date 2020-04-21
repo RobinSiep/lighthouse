@@ -30,11 +30,10 @@ def read_settings():
 @sio.event
 async def connect(sid, environ):
     request = add_request_from_environ(sid, environ)
-    if not (validate_access_token(request)):
-        return False
-
     client_type = 'web'
     if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
+        if not (validate_access_token(request)):
+            return False
         client_type = 'machine'
     else:
         await emit_machines()
