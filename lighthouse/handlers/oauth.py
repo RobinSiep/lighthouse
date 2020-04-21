@@ -4,17 +4,17 @@ from aiohttp import web
 from marshmallow import ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 
-from lighthousemaster.app import app
-from lighthousemaster.db import save
-from lighthousemaster.lib.crypto import get_random_token
-from lighthousemaster.lib.exceptions import JsonHTTPBadRequest
-from lighthousemaster.lib.exceptions.oauth import (
+from lighthouse.app import app
+from lighthouse.db import save
+from lighthouse.lib.crypto import get_random_token
+from lighthouse.lib.exceptions import JsonHTTPBadRequest
+from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
-from lighthousemaster.lib.security import extract_client_authorization
-from lighthousemaster.lib.validation.oauth import (
+from lighthouse.lib.security import extract_client_authorization
+from lighthouse.lib.validation.oauth import (
     OAuthAccessTokenSchema, OAuthClientSchema)
-from lighthousemaster.models.oauth import OAuthAccessToken, get_client
+from lighthouse.models.oauth import OAuthAccessToken, get_client
 
 routes = web.RouteTableDef()
 

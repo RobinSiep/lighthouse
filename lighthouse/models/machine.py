@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 
-from lighthousemaster.db import Base, DBSession as session
+from lighthouse.db import Base, DBSession as session
 
 
 class Machine(Base):

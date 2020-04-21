@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import register
 
-from lighthousemaster.lib.settings import settings
+from lighthouse.lib.settings import settings
 
 log = logging.getLogger(__name__)
 

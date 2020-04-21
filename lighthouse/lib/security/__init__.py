@@ -2,10 +2,10 @@ import base64
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from lighthousemaster.lib.exceptions.oauth import (
+from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
-from lighthousemaster.models.oauth import get_token_by_token
+from lighthouse.models.oauth import get_token_by_token
 
 
 def extract_client_authorization(request):

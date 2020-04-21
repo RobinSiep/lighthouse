@@ -13,7 +13,7 @@ requires = [
 ]
 
 setup(
-    name='lighthousemaster',
+    name='lighthouse',
     version='0.1',
     author='Robin Siep',
     author_email='hello@robinsiep.dev',

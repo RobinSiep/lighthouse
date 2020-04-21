@@ -1,1 +1,1 @@
-# Lighthouse master
+# Lighthouse

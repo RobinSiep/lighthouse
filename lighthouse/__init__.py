@@ -2,15 +2,15 @@ import configparser
 
 from aiohttp import web
 
-from lighthousemaster.app import app, sio
-from lighthousemaster.db import init_sqlalchemy
-from lighthousemaster.handlers.oauth import *  # noqa
-from lighthousemaster.lib.requests import (add_request_from_environ,
+from lighthouse.app import app, sio
+from lighthouse.db import init_sqlalchemy
+from lighthouse.handlers.oauth import *  # noqa
+from lighthouse.lib.requests import (add_request_from_environ,
                                            remove_request_for_sid)
-from lighthousemaster.lib.security import validate_access_token
-from lighthousemaster.lib.security.decorators import auth_required
-from lighthousemaster.lib.settings import update_settings
-from lighthousemaster.machine import (set_machine, update_machine,
+from lighthouse.lib.security import validate_access_token
+from lighthouse.lib.security.decorators import auth_required
+from lighthouse.lib.settings import update_settings
+from lighthouse.machine import (set_machine, update_machine,
                                       set_machine_offline, emit_machines)
 
 
@@ -22,8 +22,8 @@ def main():
 
 def read_settings():
     config = configparser.ConfigParser()
-    config.read('lighthouse-master/settings.ini')
-    config.read('lighthouse-master/local-settings.ini')
+    config.read('lighthouse/settings.ini')
+    config.read('lighthouse/local-settings.ini')
     update_settings(config)
 
 

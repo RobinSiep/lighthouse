@@ -3,8 +3,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from lighthousemaster.db import Base, get_connection_url
-from lighthousemaster.lib.settings import update_settings
+from lighthouse.db import Base, get_connection_url
+from lighthouse.lib.settings import update_settings
 
 target_metadata = Base.metadata
 config = context.config

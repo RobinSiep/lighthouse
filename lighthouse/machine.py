@@ -2,10 +2,10 @@ import uuid
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from lighthousemaster.app import sio
-from lighthousemaster.db import save
-from lighthousemaster.lib.validation.machine import MachineSchema
-from lighthousemaster.models.machine import (Machine, list_machines,
+from lighthouse.app import sio
+from lighthouse.db import save
+from lighthouse.lib.validation.machine import MachineSchema
+from lighthouse.models.machine import (Machine, list_machines,
                                              get_machine_by_mac_address)
 
 machine_sys_info = {}

@@ -4,8 +4,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects.postgresql import UUID
 
-from lighthousemaster.lib.settings import settings
-from lighthousemaster.models.oauth import OAuthClient
+from lighthouse.lib.settings import settings
+from lighthouse.models.oauth import OAuthClient
 
 
 """oauth
