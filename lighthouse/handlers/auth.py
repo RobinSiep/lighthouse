@@ -1,5 +1,5 @@
 from aiohttp import web
-from aiohttp_security import remember
+from aiohttp_security import forget, remember
 from marshmallow import ValidationError
 
 from lighthouse.app import app
@@ -18,6 +18,13 @@ async def login(request):
 
     response = web.json_response()
     await remember(request, response, result['username'])
+    return response
+
+
+@routes.post('/auth/logout')
+async def logout(request):
+    response = web.json_response()
+    await forget(request, response)
     return response
 
 
