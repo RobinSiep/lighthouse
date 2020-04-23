@@ -3,7 +3,9 @@ from setuptools import setup
 requires = [
     'aiohttp',
     'aiohttp-security',
+    'aiohttp_session[secure]',
     'alembic',
+    'bcrypt',
     'marshmallow',
     'psycopg2',
     'pycrypto',

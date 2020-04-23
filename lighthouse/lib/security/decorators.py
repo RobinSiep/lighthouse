@@ -1,16 +1,15 @@
 from functools import wraps
 
+from aiohttp_security import check_permission
+
 from lighthouse.lib.requests import get_request_for_sid
-from lighthouse.lib.security import validate_access_token
 
 
-def auth_required(function):
-    @wraps(function)
-    async def wrapped(sid, *args, **kwargs):
-        request = get_request_for_sid(sid)
-        if not request or not validate_access_token(request):
-            from lighthouse import disconnect
-            return await disconnect(sid)
-        else:
-            return await function(sid, *args, **kwargs)
-    return wrapped
+def permission_required(permission):
+    def decorate(func):
+        @wraps(func)
+        async def wrapped(sid, *args, **kwargs):
+            await check_permission(get_request_for_sid(sid), permission)
+            return await func(sid, *args, **kwargs)
+        return wrapped
+    return decorate
