@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from lighthouse.app import app
 from lighthouse.db import save
 from lighthouse.lib.crypto import get_random_token
+from lighthouse.lib.decorators import validate_request
 from lighthouse.lib.exceptions import JsonHTTPBadRequest
 from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
@@ -20,14 +21,9 @@ routes = web.RouteTableDef()
 
 
 @routes.post('/oauth/token')
-async def create_access_token(request):
-    schema = OAuthAccessTokenSchema()
-    try:
-        result = schema.load(await request.json())
-        grant_type = result['grant_type']
-    except ValidationError as e:
-        raise JsonHTTPBadRequest(json=str(e))
-
+@validate_request(OAuthAccessTokenSchema())
+async def create_access_token(request, result):
+    grant_type = result['grant_type']
     client = get_client_from_request(request)
 
     if (grant_type == 'client_credentials' and
@@ -49,7 +45,7 @@ async def create_access_token(request):
 
     #  Response headers according to RFC 6749
     response = web.json_response(
-        schema.dump(persisted_token),
+        OAuthAccessTokenSchema().dump(persisted_token),
         headers={
             'cache_control': 'no-store',
             'pragma': 'no-cache'

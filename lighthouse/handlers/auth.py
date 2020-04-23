@@ -1,21 +1,16 @@
 from aiohttp import web
 from aiohttp_security import forget, remember
-from marshmallow import ValidationError
 
 from lighthouse.app import app
-from lighthouse.lib.exceptions import JsonHTTPBadRequest
+from lighthouse.lib.decorators import validate_request
 from lighthouse.lib.validation.auth import LoginSchema
 
 routes = web.RouteTableDef()
 
 
 @routes.post('/auth/login')
-async def login(request):
-    try:
-        result = LoginSchema().load(await request.json())
-    except ValidationError as e:
-        raise JsonHTTPBadRequest(json=str(e))
-
+@validate_request(LoginSchema())
+async def login(request, result):
     response = web.json_response()
     await remember(request, response, result['username'])
     return response

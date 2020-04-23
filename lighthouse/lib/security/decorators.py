@@ -10,6 +10,6 @@ def permission_required(permission):
         @wraps(func)
         async def wrapped(sid, *args, **kwargs):
             await check_permission(get_request_for_sid(sid), permission)
-            await func(sid, *args, **kwargs)
+            return await func(sid, *args, **kwargs)
         return wrapped
     return decorate
