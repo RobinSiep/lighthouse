@@ -5,6 +5,7 @@ requires = [
     'aiohttp-security',
     'aiohttp_session',
     'alembic',
+    'bcrypt',
     'marshmallow',
     'psycopg2',
     'pycrypto',

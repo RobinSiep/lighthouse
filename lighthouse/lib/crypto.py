@@ -1,6 +1,12 @@
+import bcrypt
 import binascii
 
 from Crypto import Random
+
+
+def hash_str(plaintext, salt=bcrypt.gensalt()):
+    return (bcrypt.hashpw(plaintext.encode('utf-8'), salt).decode('utf-8'),
+            salt.decode('utf-8'))
 
 
 def get_random_token(number_of_bytes):
