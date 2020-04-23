@@ -6,7 +6,7 @@ from lighthouse.app import sio
 from lighthouse.db import save
 from lighthouse.lib.validation.machine import MachineSchema
 from lighthouse.models.machine import (Machine, list_machines,
-                                             get_machine_by_mac_address)
+                                       get_machine_by_mac_address)
 
 machine_sys_info = {}
 

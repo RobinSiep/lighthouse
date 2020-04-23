@@ -2,11 +2,12 @@ import configparser
 
 import socketio
 from aiohttp import web
-from aiohttp_security import SessionIdentityPolicy, setup as setup_security
+from aiohttp_security import setup as setup_security
 from aiohttp_session import SimpleCookieStorage, session_middleware
 
 from lighthouse.db import init_sqlalchemy
-from lighthouse.lib.security import DefaultAuthorizationPolicy
+from lighthouse.lib.security import (
+    DefaultAuthorizationPolicy, LighthouseIdentityPolicy)
 from lighthouse.lib.settings import update_settings
 
 sio = socketio.AsyncServer(cors_allowed_origins="*")
@@ -20,7 +21,7 @@ def main():
 
 
 def init_security():
-    policy = SessionIdentityPolicy()
+    policy = LighthouseIdentityPolicy()
     setup_security(app, policy, DefaultAuthorizationPolicy())
 
 

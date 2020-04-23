@@ -1,20 +1,44 @@
 import base64
 
+from aiohttp_security import SessionIdentityPolicy
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 from sqlalchemy.orm.exc import NoResultFound
 
 from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
+from lighthouse.lib.settings import settings
 from lighthouse.models.oauth import get_token_by_token
 
 
+class LighthouseIdentityPolicy(SessionIdentityPolicy):
+    async def identify(self, request):
+        if validate_access_token(request):
+            return 'oauth'
+
+        return super().identify(request)
+
+
 class DefaultAuthorizationPolicy(AbstractAuthorizationPolicy):
+    user_permissions = ('connect', 'disconnect')
+    oauth_permissions = ('connect', 'disconnect', 'identify', 'sys_info')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_identity = settings['user']['username']
+
     async def authorized_userid(self, identity):
-        return identity
+        if identity in ('oauth', self.user_identity):
+            return identity
 
     async def permits(self, identity, permission, context=None):
-        return True
+        permissions = ()
+        if identity == self.user_identity:
+            permissions = self.user_permissions
+        elif identity == 'oauth':
+            permissions = self.oauth_permissions
+
+        return permission in permissions
 
 
 def extract_client_authorization(request):
