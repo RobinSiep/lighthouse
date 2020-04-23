@@ -1,11 +1,20 @@
 import base64
 
+from aiohttp_security.abc import AbstractAuthorizationPolicy
 from sqlalchemy.orm.exc import NoResultFound
 
 from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
 from lighthouse.models.oauth import get_token_by_token
+
+
+class DefaultAuthorizationPolicy(AbstractAuthorizationPolicy):
+    async def authorized_userid(self, identity):
+        return identity
+
+    async def permits(self, identity, permission, context=None):
+        return True
 
 
 def extract_client_authorization(request):
