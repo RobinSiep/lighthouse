@@ -12,6 +12,7 @@ from lighthouse.lib.security import (
 from lighthouse.lib.settings import settings, update_settings
 
 sio = socketio.AsyncServer(cors_allowed_origins="*")
+app = None
 
 
 def read_settings():
@@ -26,18 +27,16 @@ def configure():
     init_sqlalchemy()
 
 
-configure()
+def init_app():
+    global app
 
-print(len(settings['session']['encryption_key'].encode('utf-8')))
-middleware = session_middleware(
-    EncryptedCookieStorage(settings['session']['encryption_key'])
-)
-app = web.Application(middlewares=[middleware])
-sio.attach(app)
+    configure()
 
-
-def main():
-    web.run_app(app, port=7102)
+    middleware = session_middleware(
+        EncryptedCookieStorage(settings['session']['encryption_key'])
+    )
+    app = web.Application(middlewares=[middleware])
+    sio.attach(app)
 
 
 def init_security():
@@ -45,6 +44,11 @@ def init_security():
     setup_security(app, policy, DefaultAuthorizationPolicy())
 
 
+def main():
+    web.run_app(app, port=7102)
+
+
+init_app()
 init_security()
 
 if __name__ == '__main__':
