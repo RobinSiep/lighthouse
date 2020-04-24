@@ -2,6 +2,7 @@ from setuptools import setup
 
 requires = [
     'aiohttp',
+    'aiohttp_cors',
     'aiohttp-security',
     'aiohttp_session[secure]',
     'alembic',

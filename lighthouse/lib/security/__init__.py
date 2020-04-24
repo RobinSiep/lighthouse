@@ -16,7 +16,7 @@ class LighthouseIdentityPolicy(SessionIdentityPolicy):
         if validate_access_token(request):
             return 'oauth'
 
-        return super().identify(request)
+        return await super().identify(request)
 
 
 class DefaultAuthorizationPolicy(AbstractAuthorizationPolicy):
