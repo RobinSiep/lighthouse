@@ -13,6 +13,7 @@ class Machine(Base):
     sid = Column(String(32), unique=True, nullable=False)
     name = Column(String(64), unique=True, nullable=False)
     mac_address = Column(String(17), unique=True, nullable=False)
+    external_ip = Column(String(32), nullable=False)
 
     def set_fields(self, data):
         for key, value in data.items():

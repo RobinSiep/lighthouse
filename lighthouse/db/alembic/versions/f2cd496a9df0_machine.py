@@ -24,7 +24,8 @@ def upgrade():
         sa.Column('sid', sa.String(length=32), unique=True, nullable=False),
         sa.Column('name', sa.String(length=64), unique=True, nullable=False),
         sa.Column('mac_address', sa.String(length=17), unique=True,
-                  nullable=False)
+                  nullable=False),
+        sa.Column('external_ip', sa.String(length=32), nullable=False)
     )
 
 
