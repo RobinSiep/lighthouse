@@ -3,6 +3,7 @@ from aiohttp_security import forget, remember
 
 from lighthouse.app import app
 from lighthouse.lib.decorators import validate_request
+from lighthouse.lib.security.cors import sync_routes
 from lighthouse.lib.validation.auth import LoginSchema
 
 routes = web.RouteTableDef()
@@ -24,3 +25,4 @@ async def logout(request):
 
 
 app.add_routes(routes)
+sync_routes(app)

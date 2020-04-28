@@ -33,7 +33,10 @@ def init_app():
     configure()
 
     middleware = session_middleware(
-        EncryptedCookieStorage(settings['session']['encryption_key'])
+        EncryptedCookieStorage(
+            settings['session']['encryption_key'],
+            httponly=False
+        )
     )
     app = web.Application(middlewares=[middleware])
     sio.attach(app)
