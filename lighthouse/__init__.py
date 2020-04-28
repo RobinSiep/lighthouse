@@ -1,5 +1,6 @@
 from lighthouse.app import sio
 from lighthouse.handlers.auth import *  # noqa
+from lighthouse.handlers.machines import *  # noqa
 from lighthouse.handlers.oauth import *  # noqa
 from lighthouse.lib.requests import (add_request_from_environ,
                                      remove_request_for_sid)
