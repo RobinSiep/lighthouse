@@ -4,6 +4,7 @@ from marshmallow import (EXCLUDE, fields, pre_load, Schema, validate,
                          validates, validates_schema, ValidationError)
 from sqlalchemy.orm.exc import NoResultFound
 
+from lighthouse.lib.validation.network_interface import NetworkInterfaceSchema
 from lighthouse.models.machine import get_machine_by_name
 
 MAC_ADDRESS_PATTERN = '[0-9A-F]{2}([-:]?)[0-9A-F]{2}(\\1[0-9A-F]{2}){4}$'
@@ -16,7 +17,9 @@ class MachineSchema(Schema):
     id = fields.String(dump_only=True)
     sid = fields.String(required=True,
                         validate=validate.Length(equal=32))
-    internal_ip = fields.String(required=True)
+    network_interfaces = fields.List(
+        fields.Nested(NetworkInterfaceSchema)
+    )
     external_ip = fields.String(required=True)
     name = fields.String(required=True,
                          validate=validate.Length(min=1, max=64))
