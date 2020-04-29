@@ -8,7 +8,6 @@ requires = [
     'alembic',
     'bcrypt',
     'marshmallow',
-    'netifaces',
     'psycopg2',
     'pycrypto',
     'python-socketio',
