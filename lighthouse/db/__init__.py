@@ -15,6 +15,10 @@ DBSession = scoped_session(sessionmaker())
 register(DBSession)
 Base = declarative_base()
 
+from lighthouse.models.machine import *  # noqa
+from lighthouse.models.network_interface import *  # noqa
+from lighthouse.models.oauth import *  # noqa
+
 
 def get_connection_url(settings_):
     return "{driver}://{user}:{password}@{host}/{database}".format(

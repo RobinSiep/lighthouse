@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects.postgresql import UUID
 
 
 """machine
@@ -20,11 +21,12 @@ depends_on = None
 def upgrade():
     op.create_table(
         'machine',
-        sa.Column('id', sa.String(length=36), primary_key=True),
+        sa.Column('id', UUID(as_uuid=True), primary_key=True),
         sa.Column('sid', sa.String(length=32), unique=True, nullable=False),
         sa.Column('name', sa.String(length=64), unique=True, nullable=False),
         sa.Column('mac_address', sa.String(length=17), unique=True,
-                  nullable=False)
+                  nullable=False),
+        sa.Column('external_ip', sa.String(length=32), nullable=False)
     )
 
 

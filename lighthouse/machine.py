@@ -5,8 +5,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from lighthouse.app import sio
 from lighthouse.db import save
 from lighthouse.lib.validation.machine import MachineSchema
-from lighthouse.models.machine import (Machine, list_machines,
-                                       get_machine_by_mac_address)
+from lighthouse.models.machine import (
+    Machine, list_machines, get_machine_by_mac_address,
+    get_machines_by_external_ip)
 
 machine_sys_info = {}
 
@@ -58,3 +59,22 @@ def merge_machine_and_sys_info(machine):
         pass
 
     return machine_data
+
+
+def get_active_machine_on_same_subnet(target_machine):
+    machines = get_machines_by_external_ip(target_machine.external_ip)
+    for machine in machines:
+        if not machine_sys_info.get(machine.sid):
+            # Machine is not active
+            continue
+
+        for target_net_interface in target_machine.network_interfaces:
+            for net_interface in machine.network_interfaces:
+                if net_interface.ip_address == target_net_interface.ip_address:
+                    # This is the same machine as the target machine. A
+                    # machine can't wake itself up.
+                    continue
+
+                if (net_interface.subnet_addr ==
+                        target_net_interface.subnet_addr):
+                    return machine

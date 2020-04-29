@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from lighthouse.db import Base, DBSession as session
 
@@ -13,6 +14,11 @@ class Machine(Base):
     sid = Column(String(32), unique=True, nullable=False)
     name = Column(String(64), unique=True, nullable=False)
     mac_address = Column(String(17), unique=True, nullable=False)
+    external_ip = Column(String(32), nullable=False)
+
+    network_interfaces = relationship('NetworkInterface',
+                                      cascade='all, delete-orphan',
+                                      back_populates='machine')
 
     def set_fields(self, data):
         for key, value in data.items():
@@ -23,6 +29,10 @@ def list_machines():
     return session.query(Machine).all()
 
 
+def get_machine_by_id(id_):
+    return session.query(Machine).get(id_)
+
+
 def get_machine_by_name(name):
     return session.query(Machine).filter(Machine.name == name).one()
 
@@ -31,3 +41,9 @@ def get_machine_by_mac_address(mac_address):
     return session.query(Machine).filter(
         Machine.mac_address == mac_address
     ).one()
+
+
+def get_machines_by_external_ip(external_ip):
+    return session.query(Machine).filter(
+        Machine.external_ip == external_ip
+    )
