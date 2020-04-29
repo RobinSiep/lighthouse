@@ -17,6 +17,7 @@ class Machine(Base):
     external_ip = Column(String(32), nullable=False)
 
     network_interfaces = relationship('NetworkInterface',
+                                      cascade='all, delete-orphan',
                                       back_populates='machine')
 
     def set_fields(self, data):
@@ -40,3 +41,9 @@ def get_machine_by_mac_address(mac_address):
     return session.query(Machine).filter(
         Machine.mac_address == mac_address
     ).one()
+
+
+def get_machines_by_external_ip(external_ip):
+    return session.query(Machine).filter(
+        Machine.external_ip == external_ip
+    )
