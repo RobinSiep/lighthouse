@@ -5,4 +5,9 @@ def network_addr_to_binary_string(addr):
 
 
 def get_subnet_size(subnet_mask):
+    """ Gets the subnet size from a subnet mask
+
+    With the subnet size we mean the amount of bits of an IP address in the
+    subnet that denote the routing prefix.
+    """
     return len(network_addr_to_binary_string(subnet_mask).replace('0', ''))
