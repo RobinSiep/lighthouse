@@ -12,6 +12,7 @@ class LoginSchema(Schema):
     @pre_load
     def read_valid_creds(self, data, **kwargs):
         self.valid_creds = settings['user']
+        return data
 
     @validates_schema
     def check_credentials(self, data, **kwargs):
