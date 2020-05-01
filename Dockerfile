@@ -5,9 +5,9 @@ RUN apt-get update
 RUN addgroup lighthouse 
 RUN useradd -g lighthouse lighthouse
 
-
 COPY . /home/lighthouse/lighthouse
 WORKDIR /home/lighthouse
+RUN mkdir config
 
 RUN pip install -e lighthouse[dev]
 
@@ -21,4 +21,4 @@ USER lighthouse
 WORKDIR /home/lighthouse/lighthouse
 
 EXPOSE 7102
-ENTRYPOINT ["lighthouse"]
+ENTRYPOINT ["lighthouse --config /home/lighthouse/config/local-settings.ini"]
