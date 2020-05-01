@@ -15,7 +15,6 @@ from lighthouse.lib.security.cors import CORS
 from lighthouse.lib.settings import settings, update_settings
 
 sio = socketio.AsyncServer(cors_allowed_origins="*")
-app = None
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -28,7 +27,6 @@ args = None
 
 def main():
     global args
-    global app
 
     args = parser.parse_args()
     app = app_factory()
