@@ -8,8 +8,10 @@ from aiohttp_session import session_middleware
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from lighthouse.db import init_sqlalchemy
+from lighthouse.lib.routes import routes
 from lighthouse.lib.security import (
     DefaultAuthorizationPolicy, LighthouseIdentityPolicy)
+from lighthouse.lib.security.cors import CORS
 from lighthouse.lib.settings import settings, update_settings
 
 sio = socketio.AsyncServer(cors_allowed_origins="*")
@@ -36,6 +38,8 @@ def main():
 def app_factory():
     app = init_app()
     init_security(app)
+    app.add_routes(routes)
+    CORS(app).sync_routes()
     return app
 
 
@@ -78,5 +82,3 @@ def init_security(app):
 
 if __name__ == '__main__':
     main()
-else:
-    app = app_factory()

@@ -4,7 +4,6 @@ from aiohttp import web
 from marshmallow import ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 
-from lighthouse.app import app
 from lighthouse.db import save
 from lighthouse.lib.crypto import get_random_token
 from lighthouse.lib.decorators import validate_request
@@ -12,12 +11,11 @@ from lighthouse.lib.exceptions import JsonHTTPBadRequest
 from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
+from lighthouse.lib.routes import routes
 from lighthouse.lib.security import extract_client_authorization
 from lighthouse.lib.validation.oauth import (
     OAuthAccessTokenSchema, OAuthClientSchema)
 from lighthouse.models.oauth import OAuthAccessToken, get_client
-
-routes = web.RouteTableDef()
 
 
 @routes.post('/oauth/token')
@@ -69,6 +67,3 @@ def get_client_from_request(request):
         return get_client(**result)
     except NoResultFound:
         raise JsonHTTPBadRequest(json="No client found for given client_id")
-
-
-app.add_routes(routes)

@@ -1,12 +1,10 @@
 from aiohttp import web
 
-from lighthouse.app import app, sio
-from lighthouse.lib.security.cors import sync_routes
+from lighthouse.app import sio
+from lighthouse.lib.routes import routes
 from lighthouse.lib.security.decorators import permission_required
 from lighthouse.machine import get_active_machine_on_same_subnet
 from lighthouse.models.machine import get_machine_by_id
-
-routes = web.RouteTableDef()
 
 
 @routes.post("/machines/{id}/wake")
@@ -29,7 +27,3 @@ async def send_wake_on_LAN_packet(request):
         to=capable_machine.sid
     )
     return web.json_response()
-
-
-app.add_routes(routes)
-sync_routes(app)

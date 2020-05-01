@@ -21,4 +21,5 @@ USER lighthouse
 WORKDIR /home/lighthouse/lighthouse
 
 EXPOSE 7102
-ENTRYPOINT ["lighthouse --config /home/lighthouse/config/local-settings.ini"]
+ENTRYPOINT ["lighthouse"]
+CMD ["--config", "/home/lighthouse/config/local-settings.ini"]

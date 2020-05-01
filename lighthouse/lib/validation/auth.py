@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
+from marshmallow import (Schema, fields, validates_schema, ValidationError,
+                         pre_load)
 
 from lighthouse.lib.crypto import hash_str
 from lighthouse.lib.settings import settings
@@ -8,8 +9,8 @@ class LoginSchema(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    @pre_load
+    def read_valid_creds(self, data, **kwargs):
         self.valid_creds = settings['user']
 
     @validates_schema
