@@ -18,7 +18,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build the image
-        run: docker build. -t mellow/lighthouse:latest .
+        run: docker build -t mellow/lighthouse:latest .
 
       - name: Push to Docker registry
         uses: actions-hub/docker@master
