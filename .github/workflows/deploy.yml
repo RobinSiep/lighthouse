@@ -1,0 +1,26 @@
+name: Deploy to Docker Hub
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Login to Docker Hub
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build the image
+        run: docker build. -t mellow/lighthouse:latest .
+
+      - name: Push to Docker registry
+        uses: actions-hub/docker@master
+        with:
+          args: push mellow/lighthouse:latest
