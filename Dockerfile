@@ -6,7 +6,7 @@ RUN addgroup lighthouse
 RUN useradd -g lighthouse lighthouse
 
 
-COPY lighthouse /home/lighthouse/lighthouse
+COPY . /home/lighthouse/lighthouse
 WORKDIR /home/lighthouse
 
 RUN pip install -e lighthouse[dev]
