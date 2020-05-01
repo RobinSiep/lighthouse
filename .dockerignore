@@ -1,0 +1,16 @@
+.git/
+.github/
+
+build
+dist
+*.egg-info
+*.egg/
+*.pyc
+*.swp
+
+.tox
+.coverage
+html/*
+__pycache__
+
+local-settings.ini

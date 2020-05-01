@@ -1,3 +1,4 @@
+import argparse
 import configparser
 
 import socketio
@@ -14,12 +15,26 @@ from lighthouse.lib.settings import settings, update_settings
 sio = socketio.AsyncServer(cors_allowed_origins="*")
 app = None
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--config', type=str, default="local-settings.ini",
+    help="Path to config location. Default is local-settings.ini in "
+    "the current directory."
+)
+
 
 def read_settings():
     config = configparser.ConfigParser()
     config.read('settings.ini')
-    config.read('local-settings.ini')
+    config.read(get_config_location())
     update_settings(config)
+
+
+def get_config_location():
+    if __name__ == '__main__':
+        args = parser.parse_args()
+        return args.config
+    return 'local-settings.ini'
 
 
 def configure():
