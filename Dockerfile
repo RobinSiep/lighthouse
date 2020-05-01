@@ -21,4 +21,4 @@ USER lighthouse
 WORKDIR /home/lighthouse/lighthouse
 
 EXPOSE 7102
-CMD ["adev", "runserver", "lighthouse"]
+ENTRYPOINT ["lighthouse"]

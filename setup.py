@@ -25,5 +25,10 @@ setup(
     author='Robin Siep',
     author_email='hello@robinsiep.dev',
     install_requires=requires,
-    extras_require={'dev': dev_requires}
+    extras_require={'dev': dev_requires},
+    entry_points={
+        'console_scripts': [
+            "lighthouse = lighthouse.app:main"
+        ]
+    }
 )

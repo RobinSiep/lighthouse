@@ -4,9 +4,6 @@
 encryption_key =
 
 [sqlalchemy]
-host = db
-database = lighthouse
-user = lighthouse
 # Required
 password =
 
