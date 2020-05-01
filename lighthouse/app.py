@@ -21,30 +21,25 @@ parser.add_argument(
     help="Path to config location. Default is local-settings.ini in "
     "the current directory."
 )
+args = None
 
 
-def read_settings():
-    config = configparser.ConfigParser()
-    config.read('settings.ini')
-    config.read(get_config_location())
-    update_settings(config)
+def main():
+    global args
+    global app
+
+    args = parser.parse_args()
+    app = app_factory()
+    web.run_app(app, port=7102)
 
 
-def get_config_location():
-    if __name__ == '__main__':
-        args = parser.parse_args()
-        return args.config
-    return 'local-settings.ini'
-
-
-def configure():
-    read_settings()
-    init_sqlalchemy()
+def app_factory():
+    app = init_app()
+    init_security(app)
+    return app
 
 
 def init_app():
-    global app
-
     configure()
 
     middleware = session_middleware(
@@ -55,19 +50,33 @@ def init_app():
     )
     app = web.Application(middlewares=[middleware])
     sio.attach(app)
+    return app
 
 
-def init_security():
+def configure():
+    read_settings()
+    init_sqlalchemy()
+
+
+def read_settings():
+    config = configparser.ConfigParser()
+    config.read('settings.ini')
+    config.read(get_config_location())
+    update_settings(config)
+
+
+def get_config_location():
+    if args:
+        return args.config
+    return 'local-settings.ini'
+
+
+def init_security(app):
     policy = LighthouseIdentityPolicy()
     setup_security(app, policy, DefaultAuthorizationPolicy())
 
 
-def main():
-    web.run_app(app, port=7102)
-
-
-init_app()
-init_security()
-
 if __name__ == '__main__':
     main()
+else:
+    app = app_factory()
