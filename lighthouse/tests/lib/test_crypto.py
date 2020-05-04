@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from lighthouse.lib.crypto import hash_str
+from lighthouse.lib.crypto import get_random_token, hash_str
 
 
 class TestHashStr(TestCase):
@@ -25,3 +25,13 @@ class TestHashStr(TestCase):
 
         self.assertNotEqual(result_salt_1, result_salt_2)
         self.assertEqual(result_hash_1, confirmation_hash)
+
+
+class TestGetRandomToken(TestCase):
+    def test_random(self):
+        self.assertNotEqual(get_random_token(32), get_random_token(32))
+
+    def test_negative_number(self):
+        with self.assertRaisesRegex(
+                ValueError, "Number of bytes can't be negative"):
+            get_random_token(-1)
