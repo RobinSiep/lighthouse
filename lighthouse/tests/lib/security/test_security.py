@@ -1,32 +1,20 @@
 import base64
-import configparser
-import contextlib
 import datetime
 import uuid
 from unittest import TestCase
 
 from aiohttp.test_utils import make_mocked_request
-from sqlalchemy import create_engine
 
-from lighthouse.db import init_sqlalchemy, commit, Base, DBSession as session
 from lighthouse.lib.crypto import get_random_token
 from lighthouse.lib.security import validate_access_token
-from lighthouse.lib.settings import settings, update_settings
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
+from lighthouse.tests import TestCaseWithDB
 
 
-class TestValidateAccessToken(TestCase):
-
+class TestValidateAccessToken(TestCaseWithDB):
     def setUp(self):
-        self.read_settings()
-        init_sqlalchemy()
+        super().setUp()
         self.insert_test_data()
-
-    def read_settings(self):
-        config = configparser.ConfigParser()
-        config.read('settings.ini')
-        config.read('test.ini')
-        update_settings(config)
 
     def insert_test_data(self):
         client_id = uuid.uuid4()
@@ -49,15 +37,7 @@ class TestValidateAccessToken(TestCase):
             access_token=self.expired_token_str,
             expiry_date=datetime.datetime.now()
         )
-        session.add_all((client, active_token, expired_token))
-        commit()
-
-    def tearDown(self):
-        with contextlib.closing(Base.metadata.bind.connect()) as con:
-            trans = con.begin()
-            for table in reversed(Base.metadata.sorted_tables):
-                con.execute(table.delete())
-            trans.commit()
+        self.persist_all((client, active_token, expired_token))
 
     def test_valid_access_token(self):
         req = self.build_mock_request('Bearer', self.active_token_str)
