@@ -6,7 +6,11 @@ from unittest import TestCase
 from aiohttp.test_utils import make_mocked_request
 
 from lighthouse.lib.crypto import get_random_token
-from lighthouse.lib.security import validate_access_token
+from lighthouse.lib.exceptions.oauth import (
+    AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
+    InvalidAuthorizationHeader)
+from lighthouse.lib.security import (
+    extract_client_authorization, validate_access_token)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
 from lighthouse.tests import TestCaseWithDB
 
@@ -68,9 +72,39 @@ class TestValidateAccessToken(TestCaseWithDB):
 
 
 class TestExtractClientAuthorization(TestCase):
-    def build_mock_request(self, method, client_id):
+    def setUp(self):
+        self.client_id = str(uuid.uuid4())
+        self.client_secret = get_random_token(32)
+
+    def test_valid_header(self):
+        req = self.build_mock_request(
+            'Basic', f"{self.client_id}:{self.client_secret}")
+        result = extract_client_authorization(req)
+
+        self.assertEqual(result['client_id'], self.client_id)
+        self.assertEqual(result['client_secret'], self.client_secret)
+
+    def test_no_header(self):
+        req = make_mocked_request('GET', '/')
+        with self.assertRaises(AuthorizationHeaderNotFound):
+            extract_client_authorization(req)
+
+    def test_wrong_auth_method(self):
+        req = self.build_mock_request(
+            'Bearer', f"{self.client_id}:{self.client_secret}"
+        )
+        with self.assertRaises(InvalidAuthorizationMethod):
+            extract_client_authorization(req)
+
+    def test_malformed_header(self):
+        req = self.build_mock_request('Basic', "test value")
+
+        with self.assertRaises(InvalidAuthorizationHeader):
+            extract_client_authorization(req)
+
+    def build_mock_request(self, method, creds):
         encoded_creds = base64.b64encode(
-            f"{client_id}:{self.client_secret}".encode('utf-8')
+            creds.encode('utf-8')
         ).decode('utf-8')
         req = make_mocked_request('GET', '/', headers={
             'Authorization': f"{method} {encoded_creds}"
