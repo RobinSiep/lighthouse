@@ -10,7 +10,8 @@ from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
 from lighthouse.lib.security import (
-    extract_client_authorization, validate_access_token)
+    extract_client_authorization, validate_access_token,
+    DefaultAuthorizationPolicy)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
 from lighthouse.tests import TestCaseWithDB
 
@@ -110,3 +111,16 @@ class TestExtractClientAuthorization(TestCase):
             'Authorization': f"{method} {encoded_creds}"
         })
         return req
+
+
+class TestAuthorizedUserid(TestCase):
+    def setUp(self):
+        self.policy = DefaultAuthorizationPolicy('test')
+
+    async def test_correct_identity(self):
+        self.assertEqual(await self.policy.authorized_userid('test'), 'test')
+        self.assertEqual(await self.policy.authorized_userid('oauth'), 'oauth')
+
+    async def test_incorrect_identity(self):
+        self.assertEqual(await self.policy.authorized_userid('nonexistent'),
+                         None)
