@@ -13,7 +13,7 @@ from lighthouse.lib.security import (
     extract_client_authorization, validate_access_token,
     DefaultAuthorizationPolicy, LighthouseIdentityPolicy)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
-from lighthouse.tests import TestCaseWithDB, async_test
+from lighthouse.test import TestCaseWithDB, async_test
 
 
 class TestValidateAccessToken(TestCaseWithDB):
