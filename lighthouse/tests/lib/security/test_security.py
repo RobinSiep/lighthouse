@@ -11,7 +11,7 @@ from lighthouse.lib.exceptions.oauth import (
     InvalidAuthorizationHeader)
 from lighthouse.lib.security import (
     extract_client_authorization, validate_access_token,
-    DefaultAuthorizationPolicy)
+    DefaultAuthorizationPolicy, LighthouseIdentityPolicy)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
 from lighthouse.tests import TestCaseWithDB, async_test
 
@@ -158,10 +158,11 @@ class TestIdentify(TestCaseWithDB):
     def setUp(self):
         super().setUp()
         self.insert_test_data()
+        self.policy = LighthouseIdentityPolicy()
 
     def insert_test_data(self):
         client_id = uuid.uuid4()
-        self.active_token_str = get_random_token(32)
+        self.token = get_random_token(32)
 
         client = OAuthClient(
             id=client_id,
@@ -170,16 +171,14 @@ class TestIdentify(TestCaseWithDB):
         )
         active_token = OAuthAccessToken(
             client_id=client_id,
-            access_token=self.active_token_str,
+            access_token=self.token,
             expiry_date=datetime.datetime.now() + datetime.timedelta(days=1)
         )
         self.persist_all((client, active_token))
 
-    def test_identify_oauth(self):
-        pass
-
-    def test_identiy_user(self):
-        pass
-
-    def test_unsuccesful_identify(self):
-        pass
+    @async_test
+    async def test_identify_oauth(self):
+        req = make_mocked_request('GET', '/', headers={
+            'Authorization': f"Bearer {self.token}"
+        })
+        self.assertEqual(await self.policy.identify(req), 'oauth')
