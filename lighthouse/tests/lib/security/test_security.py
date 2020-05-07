@@ -13,7 +13,7 @@ from lighthouse.lib.security import (
     extract_client_authorization, validate_access_token,
     DefaultAuthorizationPolicy)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
-from lighthouse.tests import TestCaseWithDB
+from lighthouse.tests import TestCaseWithDB, async_test
 
 
 class TestValidateAccessToken(TestCaseWithDB):
@@ -117,10 +117,12 @@ class TestAuthorizedUserid(TestCase):
     def setUp(self):
         self.policy = DefaultAuthorizationPolicy('test')
 
+    @async_test
     async def test_correct_identity(self):
         self.assertEqual(await self.policy.authorized_userid('test'), 'test')
         self.assertEqual(await self.policy.authorized_userid('oauth'), 'oauth')
 
+    @async_test
     async def test_incorrect_identity(self):
         self.assertEqual(await self.policy.authorized_userid('nonexistent'),
                          None)
@@ -130,20 +132,54 @@ class TestPermits(TestCase):
     def setUp(self):
         self.policy = DefaultAuthorizationPolicy('test')
 
+    @async_test
     async def test_user_permits(self):
         identity = 'test'
-        self.assertTrue(self.policy.permits(identity, 'connect'))
-        self.assertTrue(self.policy.permits(identity, 'wake_on_lan'))
-        self.assertFalse(self.policy.permits(identity, 'identify'))
+        self.assertTrue(await self.policy.permits(identity, 'connect'))
+        self.assertTrue(await self.policy.permits(identity, 'wake_on_lan'))
+        self.assertFalse(await self.policy.permits(identity, 'identify'))
 
+    @async_test
     async def test_oauth_permits(self):
         identity = 'oauth'
-        self.assertTrue(self.policy.permits(identity, 'connect'))
-        self.assertTrue(self.policy.permits(identity, 'identify'))
-        self.assertFalse(self.policy.permits(identity, 'wake_on_lan'))
+        self.assertTrue(await self.policy.permits(identity, 'connect'))
+        self.assertTrue(await self.policy.permits(identity, 'identify'))
+        self.assertFalse(await self.policy.permits(identity, 'wake_on_lan'))
 
+    @async_test
     async def test_no_permits(self):
         identity = 'fake'
-        self.assertFalse(self.policy.permits(identity, 'connect'))
-        self.assertFalse(self.policy.permits(identity, 'identify'))
-        self.assertFalse(self.policy.permits(identity, 'wake_on_lan'))
+        self.assertFalse(await self.policy.permits(identity, 'connect'))
+        self.assertFalse(await self.policy.permits(identity, 'identify'))
+        self.assertFalse(await self.policy.permits(identity, 'wake_on_lan'))
+
+
+class TestIdentify(TestCaseWithDB):
+    def setUp(self):
+        super().setUp()
+        self.insert_test_data()
+
+    def insert_test_data(self):
+        client_id = uuid.uuid4()
+        self.active_token_str = get_random_token(32)
+
+        client = OAuthClient(
+            id=client_id,
+            client_type='confidential',
+            name="test"
+        )
+        active_token = OAuthAccessToken(
+            client_id=client_id,
+            access_token=self.active_token_str,
+            expiry_date=datetime.datetime.now() + datetime.timedelta(days=1)
+        )
+        self.persist_all((client, active_token))
+
+    def test_identify_oauth(self):
+        pass
+
+    def test_identiy_user(self):
+        pass
+
+    def test_unsuccesful_identify(self):
+        pass

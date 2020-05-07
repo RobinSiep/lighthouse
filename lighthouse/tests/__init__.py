@@ -1,3 +1,4 @@
+import asyncio
 import configparser
 import contextlib
 from unittest import TestCase
@@ -30,3 +31,12 @@ class TestCaseWithDB(TestCase):
             for table in reversed(Base.metadata.sorted_tables):
                 con.execute(table.delete())
             trans.commit()
+
+
+def async_test(f):
+    def wrapper(*args, **kwargs):
+        coroutine = asyncio.coroutine(f)
+        future = coroutine(*args, **kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(future)
+    return wrapper
