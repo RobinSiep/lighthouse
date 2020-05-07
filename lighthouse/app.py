@@ -75,7 +75,11 @@ def get_config_location():
 
 def init_security(app):
     policy = LighthouseIdentityPolicy()
-    setup_security(app, policy, DefaultAuthorizationPolicy())
+    setup_security(
+        app,
+        policy,
+        DefaultAuthorizationPolicy(settings['user']['username'])
+    )
 
 
 if __name__ == '__main__':

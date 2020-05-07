@@ -10,8 +10,10 @@ requires = [
     'marshmallow',
     'psycopg2',
     'pycrypto',
+    'pytest-aiohttp',
     'python-socketio',
     'sqlalchemy',
+    'sqlalchemy_utils',
     'zope.sqlalchemy'
 ]
 

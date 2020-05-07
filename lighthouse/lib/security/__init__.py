@@ -7,7 +7,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from lighthouse.lib.exceptions.oauth import (
     AuthorizationHeaderNotFound, InvalidAuthorizationMethod,
     InvalidAuthorizationHeader)
-from lighthouse.lib.settings import settings
 from lighthouse.models.oauth import get_token_by_token
 
 
@@ -23,9 +22,9 @@ class DefaultAuthorizationPolicy(AbstractAuthorizationPolicy):
     user_permissions = ('connect', 'disconnect', 'wake_on_lan')
     oauth_permissions = ('connect', 'disconnect', 'identify', 'sys_info')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user_identity, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user_identity = settings['user']['username']
+        self.user_identity = user_identity
 
     async def authorized_userid(self, identity):
         if identity in ('oauth', self.user_identity):
