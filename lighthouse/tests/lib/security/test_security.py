@@ -124,3 +124,26 @@ class TestAuthorizedUserid(TestCase):
     async def test_incorrect_identity(self):
         self.assertEqual(await self.policy.authorized_userid('nonexistent'),
                          None)
+
+
+class TestPermits(TestCase):
+    def setUp(self):
+        self.policy = DefaultAuthorizationPolicy('test')
+
+    async def test_user_permits(self):
+        identity = 'test'
+        self.assertTrue(self.policy.permits(identity, 'connect'))
+        self.assertTrue(self.policy.permits(identity, 'wake_on_lan'))
+        self.assertFalse(self.policy.permits(identity, 'identify'))
+
+    async def test_oauth_permits(self):
+        identity = 'oauth'
+        self.assertTrue(self.policy.permits(identity, 'connect'))
+        self.assertTrue(self.policy.permits(identity, 'identify'))
+        self.assertFalse(self.policy.permits(identity, 'wake_on_lan'))
+
+    async def test_no_permits(self):
+        identity = 'fake'
+        self.assertFalse(self.policy.permits(identity, 'connect'))
+        self.assertFalse(self.policy.permits(identity, 'identify'))
+        self.assertFalse(self.policy.permits(identity, 'wake_on_lan'))
