@@ -1,5 +1,5 @@
 # Lighthouse
-![](https://github.com/RobinSiep/lighthouse>/workflows/Test+%26+Deploy/badge.svg)
+![](https://github.com/RobinSiep/lighthouse>/workflows/Test%20%26%20Deploy/badge.svg)
 Lighthouse is a tool to manage machines over a variety of networks.
 
 It provides hardware utilisation statistics for each client and allows the user to boot up a machine through a different machine on the same subnet. Over time Lighthouse is meant to contain various other features that will make it easier to manage your machines remotely.
