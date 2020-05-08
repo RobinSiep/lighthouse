@@ -44,9 +44,11 @@ def app_factory():
 def init_app():
     configure()
 
+    session_settings = settings['session']
     middleware = session_middleware(
         EncryptedCookieStorage(
-            settings['session']['encryption_key'],
+            session_settings['encryption_key'],
+            max_age=int(session_settings['max_age']),
             httponly=False
         )
     )
