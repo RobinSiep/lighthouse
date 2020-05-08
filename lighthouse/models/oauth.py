@@ -18,7 +18,7 @@ class OAuthClient(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     client_id = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True,
                        nullable=False)
-    client_secret = Column(String(64), default=get_random_token(32),
+    client_secret = Column(String(64), default=lambda: get_random_token(32),
                            nullable=False)
     client_type = Column(Enum("confidential", name="client_type"),
                          nullable=False)
@@ -36,7 +36,7 @@ class OAuthAccessToken(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     client_id = Column(UUID(as_uuid=True), ForeignKey('oauth_client.id'),
                        nullable=False)
-    access_token = Column(String(64), default=get_random_token(32),
+    access_token = Column(String(64), default=lambda: get_random_token(32),
                           unique=True, nullable=False)
     token_type = Column(Enum("Bearer", name="token_type"), default="Bearer",
                         nullable=False)
