@@ -20,7 +20,7 @@ services:
     command: >
       -c "../util/wait-for-it.sh db:5432 &&
       alembic -c test.ini upgrade heads &&
-      tail -f /dev/null"
+      python3 -m unittest discover"
   db:
     container_name: lighthouse-test-db
     image: postgres:11
