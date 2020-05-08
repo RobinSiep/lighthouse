@@ -1,4 +1,4 @@
-name: Test & Deploy to Docker Hub
+name: Test & Deploy
 
 on:
   pull_request:
