@@ -23,7 +23,7 @@ dev_requires = [
 
 setup(
     name='lighthouse',
-    version='0.1',
+    version='0.2',
     author='Robin Siep',
     author_email='hello@robinsiep.dev',
     install_requires=requires,
