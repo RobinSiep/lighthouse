@@ -5,6 +5,7 @@ encryption_key =
 
 [sqlalchemy]
 # Required
+host =
 password =
 
 [user]
