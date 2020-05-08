@@ -52,3 +52,6 @@ lighthouse --config <PATH TO YOUR local-settings.ini>
 
 ## Configuration
 Both installation methods require you to setup a `local-settings.ini` file for configuration. In this repository you can find a `local-settings.ini.dist` file. Simply rename this file to `local-settings.ini` and fill in the blanks.
+
+## Note
+This project is still very much a work in progress. Its documentation and test coverage are not up to standards.
