@@ -55,3 +55,5 @@ Both installation methods require you to setup a `local-settings.ini` file for c
 
 ## Note
 This project is still very much a work in progress. Its documentation and test coverage are not up to standards.
+
+This package is meant to be used with the packages _Lighthouse Client_ and _Lighthouse Web_. These packages are not yet publicly available.
