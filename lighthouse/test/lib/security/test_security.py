@@ -149,7 +149,7 @@ class TestPermits(TestCase):
     @async_test
     async def test_no_permits(self):
         identity = 'fake'
-        self.assertFalse(await self.policy.permits(identity, 'connect'))
+        self.assertTrue(await self.policy.permits(identity, 'connect'))
         self.assertFalse(await self.policy.permits(identity, 'identify'))
         self.assertFalse(await self.policy.permits(identity, 'wake_on_lan'))
 
