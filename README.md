@@ -1,4 +1,6 @@
 # Lighthouse
+![](https://github.com/RobinSiep/lighthouse/workflows/Test%20%26%20Deploy/badge.svg)
+
 Lighthouse is a tool to manage machines over a variety of networks.
 
 It provides hardware utilisation statistics for each client and allows the user to boot up a machine through a different machine on the same subnet. Over time Lighthouse is meant to contain various other features that will make it easier to manage your machines remotely.
@@ -56,4 +58,4 @@ Both installation methods require you to setup a `local-settings.ini` file for c
 ## Note
 This project is still very much a work in progress. Its documentation and test coverage are not up to standards.
 
-This package is meant to be used with the packages _Lighthouse Client_ and _Lighthouse Web_. These packages are not yet publicly available.
+This package is meant to be used with the packages _Lighthouse Client_ and [Lighthouse Web](https://github.com/RobinSiep/lighthouse-web). Lighthouse Client is not yet publicly available.
