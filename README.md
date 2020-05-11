@@ -13,7 +13,7 @@ You can use [Alembic](https://alembic.sqlalchemy.org/en/latest/) to keep your da
 ### Using Docker
 You don't need the source code unless you want to modify the package. If you just want to run the package you can do the following:
 ```
-docker run -t lighthouse -v .:/home/lighthouse/config mellow/lighthouse:latest
+docker run -t lighthouse -v .:/home/lighthouse/config -p 7102:7102 mellow/lighthouse:latest
 ```
 
 This expects your `local-settings.ini` to be located in your current directory.
