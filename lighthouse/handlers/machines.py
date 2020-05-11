@@ -27,3 +27,19 @@ async def send_wake_on_LAN_packet(request):
         to=capable_machine.sid
     )
     return web.json_response()
+
+
+@routes.post("/machines/{id}/shutdown")
+@permission_required('shutdown')
+async def shutdown(request):
+    machine = get_machine_by_id(request.match_info['id'])
+    if not machine:
+        return web.json_response(status=404)
+
+    await sio.emit('shutdown', to=machine.sid, callback=shutdown_callback)
+    return web.json_response()
+
+
+def shutdown_callback(status, error=None):
+    print(status)
+    print(error)
