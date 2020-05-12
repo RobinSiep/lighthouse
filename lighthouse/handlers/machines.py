@@ -41,7 +41,7 @@ async def send_wake_on_LAN_packet(request):
 @permission_required('shutdown')
 async def shutdown(request):
     machine = get_machine(request)
-    if not get_active_machine(machine.sid):
+    if get_active_machine(machine.sid) is None:
         return json_response("The machine is not online", status=409)
 
     session = await get_session(request)
