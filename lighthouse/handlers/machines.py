@@ -1,4 +1,5 @@
 from aiohttp.web import json_response
+from aiohttp_session import get_session
 
 from lighthouse.app import sio
 from lighthouse.lib.exceptions import JsonHTTPNotFound
@@ -39,10 +40,20 @@ async def send_wake_on_LAN_packet(request):
 @permission_required('shutdown')
 async def shutdown(request):
     machine = get_machine(request)
-    await sio.emit('shutdown', to=machine.sid, callback=shutdown_callback)
+    session = await get_session(request)
+    sid = session.get('sid')
+
+    await sio.emit(
+        'shutdown',
+        to=machine.sid,
+        callback=lambda status, error: shutdown_callback(status, error, sid)
+    )
     return json_response()
 
 
-def shutdown_callback(status, error=None):
-    print(status)
-    print(error)
+def shutdown_callback(status, error=None, sid=None):
+    if not status:
+        print(f"Machine shutdown failed: {error}")
+
+    if sid:
+        sio.emit('response', status, error, to=sid)
