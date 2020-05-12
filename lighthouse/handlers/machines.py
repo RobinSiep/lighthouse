@@ -5,7 +5,8 @@ from lighthouse.app import sio
 from lighthouse.lib.exceptions import JsonHTTPNotFound
 from lighthouse.lib.routes import routes
 from lighthouse.lib.security.decorators import permission_required
-from lighthouse.machine import get_active_machine_on_same_subnet
+from lighthouse.machine import (
+    get_active_machine, get_active_machine_on_same_subnet)
 from lighthouse.models.machine import get_machine_by_id
 
 
@@ -40,6 +41,9 @@ async def send_wake_on_LAN_packet(request):
 @permission_required('shutdown')
 async def shutdown(request):
     machine = get_machine(request)
+    if not get_active_machine(machine.sid):
+        return json_response("The machine is not online", status=409)
+
     session = await get_session(request)
     sid = session.get('sid')
 

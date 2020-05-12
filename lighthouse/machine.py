@@ -9,7 +9,7 @@ from lighthouse.models.machine import (
     Machine, list_machines, get_machine_by_mac_address,
     get_machines_by_external_ip)
 
-machine_sys_info = {}
+_machine_sys_info = {}
 
 
 async def set_machine(sid, machine_data):
@@ -25,22 +25,26 @@ async def set_machine(sid, machine_data):
             **validated_data
         )
 
-    machine_sys_info[sid] = {}
+    _machine_sys_info[sid] = {}
     save(machine)
 
 
 async def update_machine(sid, sys_info):
-    machine_sys_info[sid] = sys_info
+    _machine_sys_info[sid] = sys_info
     await sio.emit('machines', dump_machines())
 
 
 async def set_machine_offline(sid):
     try:
-        machine_sys_info.pop(sid)
+        _machine_sys_info.pop(sid)
         await sio.emit('machines', dump_machines())
     except KeyError:
         # Machine not found for sid, no state update
         pass
+
+
+def get_active_machine(sid):
+    return _machine_sys_info.get(sid)
 
 
 async def emit_machines():
@@ -54,7 +58,7 @@ def dump_machines():
 def merge_machine_and_sys_info(machine):
     machine_data = MachineSchema().dump(machine)
     try:
-        machine_data['sys_info'] = machine_sys_info[machine.sid]
+        machine_data['sys_info'] = _machine_sys_info[machine.sid]
     except KeyError:
         pass
 
@@ -64,7 +68,7 @@ def merge_machine_and_sys_info(machine):
 def get_active_machine_on_same_subnet(target_machine):
     machines = get_machines_by_external_ip(target_machine.external_ip)
     for machine in machines:
-        if not machine_sys_info.get(machine.sid):
+        if not _machine_sys_info.get(machine.sid):
             # Machine is not active
             continue
 
