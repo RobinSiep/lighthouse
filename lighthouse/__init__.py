@@ -1,6 +1,8 @@
+from aiohttp_session import get_session
+
 from lighthouse.app import sio
 from lighthouse.handlers.auth import *  # noqa
-from lighthouse.handlers.machines import *  # noqa
+from lighthouse.handlers.machine import *  # noqa
 from lighthouse.handlers.oauth import *  # noqa
 from lighthouse.lib.requests import (add_request_from_environ,
                                      remove_request_for_sid)
@@ -18,6 +20,9 @@ async def connect(sid, environ):
 @permission_required('connect')
 async def connect_client(sid, environ, request):
     client_type = 'web'
+    session = await get_session(request)
+    session['sid'] = sid
+
     if environ.get('HTTP_USER_AGENT') == "Lighthouse Client":
         client_type = 'machine'
     else:

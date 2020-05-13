@@ -34,16 +34,11 @@ def main():
 
 
 def app_factory():
-    app = init_app()
-    init_security(app)
-    app.add_routes(routes)
-    CORS(app).sync_routes()
-    return app
+    configure()
+    return init_app()
 
 
 def init_app():
-    configure()
-
     session_settings = settings['session']
     middleware = session_middleware(
         EncryptedCookieStorage(
@@ -54,6 +49,11 @@ def init_app():
     )
     app = web.Application(middlewares=[middleware])
     sio.attach(app)
+
+    init_security(app)
+    app.add_routes(routes)
+    CORS(app).sync_routes()
+
     return app
 
 
