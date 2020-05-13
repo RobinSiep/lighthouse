@@ -2,7 +2,7 @@ from aiohttp.web import json_response
 from aiohttp_session import get_session
 
 from lighthouse.app import sio
-from lighthouse.lib.exceptions import JsonHTTPNotFound
+from lighthouse.lib.exceptions import JsonHTTPConflict, JsonHTTPNotFound
 from lighthouse.lib.routes import routes
 from lighthouse.lib.security.decorators import permission_required
 from lighthouse.machine import (
@@ -42,7 +42,7 @@ async def send_wake_on_LAN_packet(request):
 async def shutdown(request):
     machine = get_machine(request)
     if get_active_machine(machine.sid) is None:
-        return json_response("The machine is not online", status=409)
+        raise JsonHTTPConflict("The machine is not online")
 
     session = await get_session(request)
     sid = session.get('sid')
