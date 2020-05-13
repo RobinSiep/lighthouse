@@ -1,4 +1,3 @@
-import asyncio
 import configparser
 import contextlib
 from unittest import TestCase
@@ -11,12 +10,9 @@ from lighthouse.lib.crypto import hash_str
 from lighthouse.lib.settings import update_settings
 
 
-class TestCaseWithDB(TestCase):
-    def setUp(self):
-        self.read_settings()
-        init_sqlalchemy()
-
-    def read_settings(self):
+class DBMixin:
+    @classmethod
+    def read_settings(cls):
         config = configparser.ConfigParser()
         config.read('settings.ini')
         config.read('test.ini')
@@ -26,9 +22,6 @@ class TestCaseWithDB(TestCase):
         session.add_all(data)
         commit()
 
-    def tearDown(self):
-        self.emptyTables()
-
     def emptyTables(self):
         with contextlib.closing(Base.metadata.bind.connect()) as con:
             trans = con.begin()
@@ -37,12 +30,35 @@ class TestCaseWithDB(TestCase):
             trans.commit()
 
 
-class AioHTTPTestCaseWithDB(AioHTTPTestCase, TestCaseWithDB):
+class TestCaseWithDB(TestCase, DBMixin):
+    @classmethod
+    def setUpClass(cls):
+        cls.read_settings()
+
+    def setUp(self):
+        init_sqlalchemy()
+
+    def tearDown(self):
+        self.emptyTables()
+
+
+class AioHTTPTestCaseWithDB(AioHTTPTestCase, DBMixin):
     username = "test"
     password = "test1234!?"
 
-    async def get_application(self):
+    @classmethod
+    def setUpClass(cls):
+        cls.read_settings()
 
+    def setUp(self):
+        super().setUp()
+        init_sqlalchemy()
+
+    def tearDown(self):
+        super().tearDown()
+        self.emptyTables()
+
+    async def get_application(self):
         hashed_password, salt = hash_str(self.password)
         auth_settings = {
             'user': {
@@ -59,12 +75,3 @@ class AioHTTPTestCaseWithDB(AioHTTPTestCase, TestCaseWithDB):
             'username': self.username,
             'password': self.password
         })
-
-
-def async_test(f):
-    def wrapper(*args, **kwargs):
-        coroutine = asyncio.coroutine(f)
-        future = coroutine(*args, **kwargs)
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(future)
-    return wrapper

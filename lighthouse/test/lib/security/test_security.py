@@ -3,7 +3,7 @@ import datetime
 import uuid
 from unittest import TestCase
 
-from aiohttp.test_utils import make_mocked_request
+from aiohttp.test_utils import make_mocked_request, unittest_run_loop
 
 from lighthouse.lib.crypto import get_random_token
 from lighthouse.lib.exceptions.oauth import (
@@ -13,7 +13,7 @@ from lighthouse.lib.security import (
     extract_client_authorization, validate_access_token,
     DefaultAuthorizationPolicy, LighthouseIdentityPolicy)
 from lighthouse.models.oauth import OAuthAccessToken, OAuthClient
-from lighthouse.test import TestCaseWithDB, async_test
+from lighthouse.test import TestCaseWithDB, AioHTTPTestCaseWithDB
 
 
 class TestValidateAccessToken(TestCaseWithDB):
@@ -113,40 +113,42 @@ class TestExtractClientAuthorization(TestCase):
         return req
 
 
-class TestAuthorizedUserid(TestCase):
+class TestAuthorizedUserid(AioHTTPTestCaseWithDB):
     def setUp(self):
+        super().setUp()
         self.policy = DefaultAuthorizationPolicy('test')
 
-    @async_test
+    @unittest_run_loop
     async def test_correct_identity(self):
         self.assertEqual(await self.policy.authorized_userid('test'), 'test')
         self.assertEqual(await self.policy.authorized_userid('oauth'), 'oauth')
 
-    @async_test
+    @unittest_run_loop
     async def test_incorrect_identity(self):
         self.assertEqual(await self.policy.authorized_userid('nonexistent'),
                          None)
 
 
-class TestPermits(TestCase):
+class TestPermits(AioHTTPTestCaseWithDB):
     def setUp(self):
+        super().setUp()
         self.policy = DefaultAuthorizationPolicy('test')
 
-    @async_test
+    @unittest_run_loop
     async def test_user_permits(self):
         identity = 'test'
         self.assertTrue(await self.policy.permits(identity, 'connect'))
         self.assertTrue(await self.policy.permits(identity, 'wake_on_lan'))
         self.assertFalse(await self.policy.permits(identity, 'identify'))
 
-    @async_test
+    @unittest_run_loop
     async def test_oauth_permits(self):
         identity = 'oauth'
         self.assertTrue(await self.policy.permits(identity, 'connect'))
         self.assertTrue(await self.policy.permits(identity, 'identify'))
         self.assertFalse(await self.policy.permits(identity, 'wake_on_lan'))
 
-    @async_test
+    @unittest_run_loop
     async def test_no_permits(self):
         identity = 'fake'
         self.assertFalse(await self.policy.permits(identity, 'connect'))
@@ -154,7 +156,7 @@ class TestPermits(TestCase):
         self.assertFalse(await self.policy.permits(identity, 'wake_on_lan'))
 
 
-class TestIdentify(TestCaseWithDB):
+class TestIdentify(AioHTTPTestCaseWithDB):
     def setUp(self):
         super().setUp()
         self.insert_test_data()
@@ -176,7 +178,7 @@ class TestIdentify(TestCaseWithDB):
         )
         self.persist_all((client, active_token))
 
-    @async_test
+    @unittest_run_loop
     async def test_identify_oauth(self):
         req = make_mocked_request('GET', '/', headers={
             'Authorization': f"Bearer {self.token}"

@@ -29,9 +29,27 @@ class TestShutdown(AioHTTPTestCaseWithDB):
 
         machine_id = self.persist_machine(machine_data)
         await set_machine(self.test_machine_sid, machine_data)
+
         resp = await self.client.request('POST', self.url.format(
             str(machine_id)))
+
         self.assertEqual(resp.status, 200)
+
+    @unittest_run_loop
+    async def test_offline(self):
+        await self.login()
+        machine_data = {
+            'sid': self.test_machine_sid,
+            'external_ip': "000.000.000.00",
+            'name': 'test',
+            'mac_address': "00:00:00:00:00:00"
+        }
+        machine_id = self.persist_machine(machine_data)
+
+        resp = await self.client.request('POST', self.url.format(
+            str(machine_id)))
+
+        self.assertEqual(resp.status, 409)
 
     def persist_machine(self, machine_data):
         machine_id = uuid.uuid4()
@@ -43,6 +61,6 @@ class TestShutdown(AioHTTPTestCaseWithDB):
         ])
         return machine_id
 
-    async def tearDown(self):
+    def tearDown(self):
         super().tearDown()
-        await set_machine_offline(self.test_machine_sid)
+        set_machine_offline(self.test_machine_sid)
