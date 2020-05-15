@@ -55,9 +55,9 @@ async def shutdown(request):
     return json_response()
 
 
-def shutdown_callback(status, error=None, sid=None):
+async def shutdown_callback(status, error=None, sid=None):
     if not status:
         print(f"Machine shutdown failed: {error}")
 
     if sid:
-        sio.emit('response', status, error, to=sid)
+        await sio.emit('response', (status, error), to=sid)
