@@ -64,3 +64,53 @@ class TestShutdown(AioHTTPTestCaseWithDB):
     def tearDown(self):
         super().tearDown()
         set_machine_offline(self.test_machine_sid)
+
+
+class TestReboot(AioHTTPTestCaseWithDB):
+    url = "/machines/{}/reboot"
+
+    def setUp(self):
+        super().setUp()
+        self.persist_test_machines()
+
+    def persist_test_machines(self):
+        self.target_machine_data = {
+            'id': uuid.uuid4(),
+            'sid': 'pv6unfHUGAeslPlTYJJZTvQhkbJQNbcf',
+            'name': 'target',
+            'external_ip': "000.000.000.00",
+            'mac_address': '00:00:00:00:00:00'
+        }
+        self.wol_capable_machine_data = {
+            'id': uuid.uuid4(),
+            'sid': 'OvFOP2azfft0rc5RD639MEkRitJmjdJY',
+            'name': 'wol',
+            'external_ip': "111.111.111.11",
+            'mac_address': '11:11:11:11:11:11'
+        }
+        self.persist_all((
+            Machine(**self.target_machine_data),
+            Machine(**self.wol_capable_machine_data)
+        ))
+
+    @unittest_run_loop
+    async def test_machine_not_found(self):
+        await self.login()
+        resp = await self.client.request('POST', self.url.format(uuid.uuid4()))
+        self.assertEqual(resp.status, 404)
+
+    @unittest_run_loop
+    async def test_no_WOL_capable_machine_available(self):
+        pass
+
+    @unittest_run_loop
+    async def test_machine_offline(self):
+        pass
+
+    @unittest_run_loop
+    async def test_reboot_after_disconnect(self):
+        pass
+
+    @unittest_run_loop
+    async def test_reboot_after_max_polling_reached(self):
+        pass
