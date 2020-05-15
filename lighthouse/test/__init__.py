@@ -1,6 +1,7 @@
 import configparser
 import contextlib
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from aiohttp.test_utils import AioHTTPTestCase
 
@@ -8,6 +9,8 @@ from lighthouse.app import init_app
 from lighthouse.db import init_sqlalchemy, commit, Base, DBSession as session
 from lighthouse.lib.crypto import hash_str
 from lighthouse.lib.settings import update_settings
+
+MagicMock.__await__ = lambda x: async_mock().__await__()
 
 
 class DBMixin:
@@ -75,3 +78,7 @@ class AioHTTPTestCaseWithDB(AioHTTPTestCase, DBMixin):
             'username': self.username,
             'password': self.password
         })
+
+
+async def async_mock():
+    pass

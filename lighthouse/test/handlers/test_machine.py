@@ -1,9 +1,11 @@
 import uuid
+from unittest.mock import patch
 
 from aiohttp.test_utils import unittest_run_loop
 
-from lighthouse.machine import set_machine, set_machine_offline
+from lighthouse.machine import set_machine, clear_machine_sys_info
 from lighthouse.models.machine import Machine
+from lighthouse.models.network_interface import NetworkInterface
 from lighthouse.test import AioHTTPTestCaseWithDB
 
 
@@ -63,11 +65,12 @@ class TestShutdown(AioHTTPTestCaseWithDB):
 
     def tearDown(self):
         super().tearDown()
-        set_machine_offline(self.test_machine_sid)
+        clear_machine_sys_info()
 
 
 class TestReboot(AioHTTPTestCaseWithDB):
     url = "/machines/{}/reboot"
+    target_id = uuid.uuid4()
 
     def setUp(self):
         super().setUp()
@@ -75,23 +78,35 @@ class TestReboot(AioHTTPTestCaseWithDB):
 
     def persist_test_machines(self):
         self.target_machine_data = {
-            'id': uuid.uuid4(),
+            'id': self.target_id,
             'sid': 'pv6unfHUGAeslPlTYJJZTvQhkbJQNbcf',
             'name': 'target',
-            'external_ip': "000.000.000.00",
-            'mac_address': '00:00:00:00:00:00'
+            'external_ip': '000.000.000.00',
+            'mac_address': '00:00:00:00:00:00',
+            'network_interfaces': [NetworkInterface(
+                name='en0',
+                ip_address='192.168.178.41',
+                netmask='255.255.255.0'
+            )]
         }
         self.wol_capable_machine_data = {
             'id': uuid.uuid4(),
             'sid': 'OvFOP2azfft0rc5RD639MEkRitJmjdJY',
             'name': 'wol',
-            'external_ip': "111.111.111.11",
-            'mac_address': '11:11:11:11:11:11'
+            'external_ip': '000.000.000.00',
+            'mac_address': '11:11:11:11:11:11',
+            'network_interfaces': [NetworkInterface(
+                name='en0',
+                ip_address='192.168.178.23',
+                netmask='255.255.255.0'
+            )]
         }
         self.persist_all((
             Machine(**self.target_machine_data),
             Machine(**self.wol_capable_machine_data)
         ))
+        self.target_machine_data.pop('network_interfaces')
+        self.wol_capable_machine_data.pop('network_interfaces')
 
     @unittest_run_loop
     async def test_machine_not_found(self):
@@ -101,11 +116,28 @@ class TestReboot(AioHTTPTestCaseWithDB):
 
     @unittest_run_loop
     async def test_no_WOL_capable_machine_available(self):
-        pass
+        return
+        await self.login()
+        await set_machine(self.target_machine_data['sid'],
+                          self.target_machine_data)
+
+        resp = await self.client.request('POST',
+                                         self.url.format(self.target_id))
+
+        self.assertEqual(resp.status, 409)
 
     @unittest_run_loop
     async def test_machine_offline(self):
-        pass
+        await self.login()
+        await set_machine(self.wol_capable_machine_data['sid'],
+                          self.wol_capable_machine_data)
+
+        with patch('lighthouse.handlers.machine._wake') as wake:
+            resp = await self.client.request('POST',
+                                             self.url.format(self.target_id))
+
+            wake.assert_called()
+            self.assertEqual(resp.status, 200)
 
     @unittest_run_loop
     async def test_reboot_after_disconnect(self):
@@ -114,3 +146,7 @@ class TestReboot(AioHTTPTestCaseWithDB):
     @unittest_run_loop
     async def test_reboot_after_max_polling_reached(self):
         pass
+
+    def tearDown(self):
+        super().tearDown()
+        clear_machine_sys_info()

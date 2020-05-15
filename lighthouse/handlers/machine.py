@@ -86,21 +86,19 @@ async def reboot(request):
     sid = session.get('sid')
     await _shutdown(machine, sid)
 
-    await poll_for_disconnect(
-        machine.sid,
-        lambda: _wake(machine.sid, wol_capable_machine),
-        5,
-        60
-    )
+    async def disconnect_callback():
+        _wake(machine.sid, wol_capable_machine),
+
+    await poll_for_disconnect(machine.sid, disconnect_callback, 5, 60)
 
 
 async def poll_for_disconnect(sid, callback, interval_in_s, max_time_in_s):
     for i in range(0, max_time_in_s, interval_in_s):
         await asyncio.sleep(interval_in_s)
         if get_active_machine(sid) is None:
-            callback()
+            await callback()
             return
-    callback()
+    await callback()
 
 
 async def shutdown_callback(status, error=None, sid=None):

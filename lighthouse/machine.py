@@ -55,6 +55,11 @@ def dump_machines():
     return list(map(merge_machine_and_sys_info, list_machines()))
 
 
+def clear_machine_sys_info():
+    global _machine_sys_info
+    _machine_sys_info = {}
+
+
 def merge_machine_and_sys_info(machine):
     machine_data = MachineSchema().dump(machine)
     try:
@@ -68,7 +73,7 @@ def merge_machine_and_sys_info(machine):
 def get_active_machine_on_same_subnet(target_machine):
     machines = get_machines_by_external_ip(target_machine.external_ip)
     for machine in machines:
-        if not _machine_sys_info.get(machine.sid):
+        if _machine_sys_info.get(machine.sid) is None:
             # Machine is not active
             continue
 
