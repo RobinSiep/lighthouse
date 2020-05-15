@@ -11,6 +11,9 @@ from lighthouse.machine import (
     get_active_machine, get_active_machine_on_same_subnet)
 from lighthouse.models.machine import get_machine_by_id
 
+DISCONNECT_INTERVAL = 5
+DISCONNECT_TIMEOUT = 60
+
 
 def get_machine(request):
     machine = get_machine_by_id(request.match_info['id'])
@@ -89,7 +92,9 @@ async def reboot(request):
     async def disconnect_callback():
         _wake(machine.sid, wol_capable_machine),
 
-    await poll_for_disconnect(machine.sid, disconnect_callback, 5, 60)
+    await poll_for_disconnect(machine.sid, disconnect_callback,
+                              DISCONNECT_INTERVAL, DISCONNECT_TIMEOUT)
+    return json_response()
 
 
 async def poll_for_disconnect(sid, callback, interval_in_s, max_time_in_s):

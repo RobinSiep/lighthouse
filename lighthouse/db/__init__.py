@@ -11,7 +11,8 @@ from lighthouse.lib.settings import settings
 
 log = logging.getLogger(__name__)
 
-DBSession = scoped_session(sessionmaker())
+session_factory = sessionmaker()
+DBSession = scoped_session(session_factory)
 register(DBSession)
 Base = declarative_base()
 

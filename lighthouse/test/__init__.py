@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from aiohttp.test_utils import AioHTTPTestCase
 
 from lighthouse.app import init_app
-from lighthouse.db import init_sqlalchemy, commit, Base, DBSession as session
+from lighthouse.db import init_sqlalchemy, commit, Base, session_factory
 from lighthouse.lib.crypto import hash_str
 from lighthouse.lib.settings import update_settings
 
@@ -21,8 +21,12 @@ class DBMixin:
         config.read('test.ini')
         update_settings(config)
 
+    def setup_sqlalchemy(self):
+        init_sqlalchemy()
+        self.session = session_factory()
+
     def persist_all(self, data):
-        session.add_all(data)
+        self.session.add_all(data)
         commit()
 
     def emptyTables(self):
@@ -31,6 +35,7 @@ class DBMixin:
             for table in reversed(Base.metadata.sorted_tables):
                 con.execute(table.delete())
             trans.commit()
+        self.session.close()
 
 
 class TestCaseWithDB(TestCase, DBMixin):
@@ -39,7 +44,7 @@ class TestCaseWithDB(TestCase, DBMixin):
         cls.read_settings()
 
     def setUp(self):
-        init_sqlalchemy()
+        self.setup_sqlalchemy()
 
     def tearDown(self):
         self.emptyTables()
@@ -55,7 +60,7 @@ class AioHTTPTestCaseWithDB(AioHTTPTestCase, DBMixin):
 
     def setUp(self):
         super().setUp()
-        init_sqlalchemy()
+        self.setup_sqlalchemy()
 
     def tearDown(self):
         super().tearDown()

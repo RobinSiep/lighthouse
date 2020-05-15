@@ -3,7 +3,8 @@ from unittest.mock import patch
 
 from aiohttp.test_utils import unittest_run_loop
 
-from lighthouse.machine import set_machine, clear_machine_sys_info
+from lighthouse.machine import (set_machine, clear_machine_sys_info,
+                                set_machine_offline, update_machine)
 from lighthouse.models.machine import Machine
 from lighthouse.models.network_interface import NetworkInterface
 from lighthouse.test import AioHTTPTestCaseWithDB
@@ -75,6 +76,7 @@ class TestReboot(AioHTTPTestCaseWithDB):
     def setUp(self):
         super().setUp()
         self.persist_test_machines()
+        self.mock_wake = patch('lighthouse.handlers.machine._wake')
 
     def persist_test_machines(self):
         self.target_machine_data = {
@@ -116,7 +118,6 @@ class TestReboot(AioHTTPTestCaseWithDB):
 
     @unittest_run_loop
     async def test_no_WOL_capable_machine_available(self):
-        return
         await self.login()
         await set_machine(self.target_machine_data['sid'],
                           self.target_machine_data)
@@ -132,7 +133,7 @@ class TestReboot(AioHTTPTestCaseWithDB):
         await set_machine(self.wol_capable_machine_data['sid'],
                           self.wol_capable_machine_data)
 
-        with patch('lighthouse.handlers.machine._wake') as wake:
+        with self.mock_wake as wake:
             resp = await self.client.request('POST',
                                              self.url.format(self.target_id))
 
@@ -141,11 +142,42 @@ class TestReboot(AioHTTPTestCaseWithDB):
 
     @unittest_run_loop
     async def test_reboot_after_disconnect(self):
-        pass
+        await self.login()
+        await update_machine(self.wol_capable_machine_data['sid'],
+                             self.wol_capable_machine_data)
+        await update_machine(self.target_machine_data['sid'],
+                             self.target_machine_data)
+
+        async def shutdown_mock(machine, requesting_sid):
+            await set_machine_offline(machine.sid)
+
+        with patch('lighthouse.handlers.machine._shutdown',
+                   side_effect=shutdown_mock) as shutdown:
+            with self.mock_wake as wake:
+                resp = await self.client.request(
+                    'POST', self.url.format(self.target_id))
+
+                shutdown.assert_called()
+                wake.assert_called()
+                self.assertEqual(resp.status, 200)
 
     @unittest_run_loop
+    @patch('lighthouse.handlers.machine.DISCONNECT_TIMEOUT', 1)
     async def test_reboot_after_max_polling_reached(self):
-        pass
+        await self.login()
+        await update_machine(self.wol_capable_machine_data['sid'],
+                             self.wol_capable_machine_data)
+        await update_machine(self.target_machine_data['sid'],
+                             self.target_machine_data)
+
+        with patch('lighthouse.handlers.machine._shutdown') as shutdown:
+            with self.mock_wake as wake:
+                resp = await self.client.request(
+                    'POST', self.url.format(self.target_id))
+
+                shutdown.assert_called()
+                wake.assert_called()
+                self.assertEqual(resp.status, 200)
 
     def tearDown(self):
         super().tearDown()
