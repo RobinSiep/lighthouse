@@ -29,6 +29,8 @@ jobs:
 
       - name: Test with unittest
         run: docker-compose -f test-compose.yml up --exit-code-from lighthouse-test lighthouse-test
+      - name: Upload coverage report
+        run: bash <(curl -s https://codecov.io/bash)
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest

@@ -10,6 +10,7 @@ WORKDIR /home/lighthouse
 RUN mkdir config
 
 RUN pip install -e lighthouse[dev]
+RUN pip install coverage
 
 # Download wait-for-it to allow waiting for dependency containers
 RUN mkdir util
