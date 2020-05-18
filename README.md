@@ -1,5 +1,6 @@
 # Lighthouse
 ![](https://github.com/RobinSiep/lighthouse/workflows/Test%20%26%20Deploy/badge.svg)
+[![codecov](https://codecov.io/gh/RobinSiep/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/RobinSiep/lighthouse)
 
 Lighthouse is a tool to manage machines over a variety of networks.
 
