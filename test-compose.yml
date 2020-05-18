@@ -21,7 +21,6 @@ services:
       -c "../util/wait-for-it.sh db:5432 &&
       alembic -c test.ini upgrade heads &&
       coverage run -m unittest discover &&
-      coverage report -m &&
       coverage html"
   db:
     container_name: lighthouse-test-db
