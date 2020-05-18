@@ -28,8 +28,6 @@ jobs:
           python3 -m flake8 . --count --exit-zero --statistics
       - name: Test with unittest
         run: |
-          touch .coverage
-          chmod +rwx .coverage
           docker-compose -f test-compose.yml up --exit-code-from lighthouse-test lighthouse-test
       - name: Upload coverage report
         run: bash <(curl -s https://codecov.io/bash)

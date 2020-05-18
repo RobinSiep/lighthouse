@@ -17,8 +17,6 @@ RUN mkdir util
 RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > util/wait-for-it.sh
 RUN chmod +x util/wait-for-it.sh
 
-USER lighthouse
-
 WORKDIR /home/lighthouse/lighthouse
 
 EXPOSE 7102
