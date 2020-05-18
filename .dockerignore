@@ -11,6 +11,7 @@ dist
 .tox
 .coverage
 html/*
+htmlcov/
 __pycache__
 
 local-settings.ini

@@ -26,9 +26,11 @@ jobs:
           # stop the build if there are Python syntax errors or undefined names
           python3 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           python3 -m flake8 . --count --exit-zero --statistics
-
       - name: Test with unittest
-        run: docker-compose -f test-compose.yml up --exit-code-from lighthouse-test lighthouse-test
+        run: |
+          docker-compose -f test-compose.yml up --exit-code-from lighthouse-test lighthouse-test
+      - name: Upload coverage report
+        run: bash <(curl -s https://codecov.io/bash)
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
