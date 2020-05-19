@@ -20,7 +20,7 @@ class LighthouseIdentityPolicy(SessionIdentityPolicy):
 
 class DefaultAuthorizationPolicy(AbstractAuthorizationPolicy):
     user_permissions = ('connect', 'disconnect', 'wake_on_lan', 'shutdown',
-                        'reboot')
+                        'reboot', 'ports')
     oauth_permissions = ('connect', 'disconnect', 'identify', 'sys_info')
 
     def __init__(self, user_identity, *args, **kwargs):
