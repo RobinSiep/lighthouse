@@ -19,6 +19,8 @@ class Machine(Base):
     network_interfaces = relationship('NetworkInterface',
                                       cascade='all, delete-orphan',
                                       back_populates='machine')
+    ports = relationship('Port', cascade='all, delete-orphan',
+                         back_populates='machine')
 
     def set_fields(self, data):
         for key, value in data.items():
