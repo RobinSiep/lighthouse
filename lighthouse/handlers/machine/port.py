@@ -18,9 +18,6 @@ async def list_ports(request):
     if get_active_machine(machine.sid) is None:
         raise JsonHTTPConflict("The machine is not online")
 
-    async def ports_callback(ports):
-        print(ports)
-
     await sio.emit('emit_ports', to=machine.sid,
                    callback=lambda ports: update_ports(machine, ports))
     return json_response()
