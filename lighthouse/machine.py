@@ -31,13 +31,13 @@ async def set_machine(sid, machine_data):
 
 async def update_machine(sid, sys_info):
     _machine_sys_info[sid] = sys_info
-    await sio.emit('machines', dump_machines())
+    await emit_machines()
 
 
 async def set_machine_offline(sid):
     try:
         _machine_sys_info.pop(sid)
-        await sio.emit('machines', dump_machines())
+        await emit_machines()
     except KeyError:
         # Machine not found for sid, no state update
         pass
