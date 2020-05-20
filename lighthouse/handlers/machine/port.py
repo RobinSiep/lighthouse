@@ -1,5 +1,4 @@
 from aiohttp.web import json_response
-from aiohttp_session import get_session
 
 from lighthouse.app import sio
 from lighthouse.handlers.machine import get_machine
@@ -17,10 +16,7 @@ async def list_ports(request):
     if get_active_machine(machine.sid) is None:
         raise JsonHTTPConflict("The machine is not online")
 
-    session = await get_session(request)
-    sid = session.get('sid')
-
-    def ports_callback(ports):
+    async def ports_callback(ports):
         print(ports)
 
     await sio.emit('emit_ports', to=machine.sid, callback=ports_callback)
